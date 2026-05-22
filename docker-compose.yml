@@ -1,0 +1,17 @@
+# TODO: Implement the local 9-container environment required by the challenge.
+#
+# Expected local shape:
+# - 5 app containers:
+#   - auth-service
+#   - flag-service
+#   - targeting-service
+#   - evaluation-service
+#   - analytics-service
+# - 4 dependency containers:
+#   - PostgreSQL for auth-service
+#   - PostgreSQL for flag-service and targeting-service local databases
+#   - Redis for evaluation-service
+#   - Local NoSQL/analytics dependency for analytics-service
+#
+# We will fill this file after the service Dockerfiles are in place.
+services: {}

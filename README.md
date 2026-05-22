@@ -2,6 +2,35 @@
 
 Submission repository for the Phase 2 Tech Challenge.
 
+## Structure
+
+This repository is organized to follow the Tech Challenge requirements one by one.
+
+```text
+.
+|-- services/                 # Imported application source code
+|-- docker/                   # Docker notes and shared containerization decisions
+|-- docker-compose.yml        # Local 9-container environment, to be implemented
+|-- k8s/                      # Kubernetes manifests
+|   |-- base/                 # Common manifests
+|   `-- overlays/             # Environment-specific values
+|-- infra/                    # Cloud provisioning notes and commands
+|   `-- oci/                  # Oracle Cloud Infrastructure setup
+|-- scripts/                  # Repeatable local/cloud helper scripts
+|-- docs/                     # Architecture, decisions, fixes, and delivery report
+`-- evidence/                 # Command outputs/screenshots used in final delivery
+```
+
+## Execution order
+
+1. Containerize each service with a Dockerfile.
+2. Create the root Docker Compose setup for local validation.
+3. Provision the cloud infrastructure.
+4. Build and publish images to OCIR.
+5. Create Kubernetes manifests for deployments, services, secrets, config maps, ingress, and autoscaling.
+6. Validate scaling and data persistence.
+7. Finish the report and video evidence.
+
 ## Imported services
 
 The initial service source code was imported from the public FIAP ToggleMaster repositories:
