@@ -1,0 +1,28 @@
+.DS_Store
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+kubeconfig*
+credentials*
+
+# Build/cache outputs
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+bin/
+dist/
+build/
+coverage/
+
+# Dependency folders
+node_modules/
+vendor/
