@@ -5,7 +5,10 @@ High-level architecture notes for the final report.
 ## Diagram
 
 - Editable draw.io source: `docs/diagrams/overall-architecture.drawio`
-- Report image export: `docs/diagrams/overall-architecture.png`
+- Generated SVG export: `docs/diagrams/overall-architecture.svg`
+- Generated report image export: `docs/diagrams/overall-architecture.png`
+
+`docs/diagrams/overall-architecture.drawio` is the source of truth. Regenerate exports with `npm run diagrams:export`.
 
 ## Services
 
