@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980" role="img" aria-labelledby="title desc">
+  <title id="title">Arquitetura geral do ToggleMaster na Oracle Cloud Infrastructure</title>
+  <desc id="desc">Diagrama com cliente, OCI Load Balancer, Nginx Ingress em OKE, cinco microsserviços, OCIR, PostgreSQL, Redis, OCI Queue e OCI NoSQL.</desc>
+  <defs>
+    <marker id="arrow-slate" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#16a34a"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/>
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/>
+    </marker>
+    <marker id="arrow-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0284c7"/>
+    </marker>
+    <marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#d97706"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; fill: #0f172a; }
+      .title { font-size: 24px; font-weight: 800; }
+      .label { font-size: 20px; font-weight: 800; }
+      .sub { font-size: 16px; fill: #475569; }
+      .edge-label { font-size: 14px; fill: #334155; font-weight: 700; }
+      .box { rx: 12; ry: 12; stroke-width: 2; }
+      .edge { fill: none; stroke-width: 3; }
+      .dashed { stroke-dasharray: 10 8; }
+    </style>
+  </defs>
+  <rect x="0" y="0" width="1600" height="980" fill="#ffffff"/>
+  <rect x="210" y="50" width="1290" height="840" rx="18" fill="#f8fafc" stroke="#334155" stroke-width="2" stroke-dasharray="12 10"/>
+  <text x="235" y="88" class="title">Oracle Cloud Infrastructure</text>
+  <rect x="360" y="170" width="700" height="580" rx="16" fill="#eef6ff" stroke="#2563eb" stroke-width="3"/>
+  <text x="390" y="208" class="title">OKE - Kubernetes Cluster</text>
+  <text x="390" y="232" class="sub">Namespace: togglemaster</text>
+
+  <rect x="40" y="280" width="150" height="80" class="box" fill="#ffffff" stroke="#475569"/>
+  <text x="115" y="312" text-anchor="middle" class="label">Usuário</text>
+  <text x="115" y="338" text-anchor="middle" class="sub">curl / Postman</text>
+
+  <rect x="240" y="280" width="150" height="70" class="box" fill="#fff7ed" stroke="#ea580c"/>
+  <text x="315" y="309" text-anchor="middle" class="label">OCI Load</text>
+  <text x="315" y="334" text-anchor="middle" class="label">Balancer</text>
+
+  <rect x="430" y="280" width="150" height="80" class="box" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="505" y="312" text-anchor="middle" class="label">Nginx</text>
+  <text x="505" y="338" text-anchor="middle" class="label">Ingress</text>
+
+  <rect x="1140" y="100" width="210" height="90" class="box" fill="#fef3c7" stroke="#d97706"/>
+  <text x="1245" y="132" text-anchor="middle" class="label">OCIR</text>
+  <text x="1245" y="158" text-anchor="middle" class="sub">Container Registry</text>
+  <text x="1245" y="180" text-anchor="middle" class="sub">5 imagens</text>
+
+  <rect x="650" y="230" width="160" height="75" class="box" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="730" y="262" text-anchor="middle" class="label">auth-service</text>
+  <text x="730" y="288" text-anchor="middle" class="sub">Go API keys</text>
+
+  <rect x="650" y="335" width="160" height="75" class="box" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="730" y="367" text-anchor="middle" class="label">flag-service</text>
+  <text x="730" y="393" text-anchor="middle" class="sub">Feature flags</text>
+
+  <rect x="650" y="440" width="160" height="75" class="box" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="730" y="472" text-anchor="middle" class="label">targeting</text>
+  <text x="730" y="498" text-anchor="middle" class="sub">rules service</text>
+
+  <rect x="860" y="335" width="160" height="75" class="box" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="940" y="367" text-anchor="middle" class="label">evaluation</text>
+  <text x="940" y="393" text-anchor="middle" class="sub">hot path</text>
+
+  <rect x="860" y="565" width="160" height="75" class="box" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="940" y="597" text-anchor="middle" class="label">analytics</text>
+  <text x="940" y="623" text-anchor="middle" class="sub">consumer</text>
+
+  <g>
+    <ellipse cx="1235" cy="245" rx="75" ry="18" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+    <rect x="1160" y="245" width="150" height="50" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+    <ellipse cx="1235" cy="295" rx="75" ry="18" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+    <text x="1235" y="270" text-anchor="middle" class="label">PostgreSQL</text>
+    <text x="1235" y="294" text-anchor="middle" class="sub">auth DB</text>
+  </g>
+  <g>
+    <ellipse cx="1235" cy="350" rx="75" ry="18" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+    <rect x="1160" y="350" width="150" height="50" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+    <ellipse cx="1235" cy="400" rx="75" ry="18" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+    <text x="1235" y="375" text-anchor="middle" class="label">PostgreSQL</text>
+    <text x="1235" y="399" text-anchor="middle" class="sub">flags DB</text>
+  </g>
+  <g>
+    <ellipse cx="1235" cy="455" rx="75" ry="18" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+    <rect x="1160" y="455" width="150" height="50" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+    <ellipse cx="1235" cy="505" rx="75" ry="18" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+    <text x="1235" y="480" text-anchor="middle" class="label">PostgreSQL</text>
+    <text x="1235" y="504" text-anchor="middle" class="sub">targeting DB</text>
+  </g>
+  <g>
+    <ellipse cx="1235" cy="560" rx="75" ry="18" fill="#fee2e2" stroke="#b91c1c" stroke-width="2"/>
+    <rect x="1160" y="560" width="150" height="50" fill="#fee2e2" stroke="#b91c1c" stroke-width="2"/>
+    <ellipse cx="1235" cy="610" rx="75" ry="18" fill="#fee2e2" stroke="#b91c1c" stroke-width="2"/>
+    <text x="1235" y="585" text-anchor="middle" class="label">Redis</text>
+    <text x="1235" y="609" text-anchor="middle" class="sub">cache</text>
+  </g>
+  <rect x="1160" y="660" width="150" height="75" class="box" fill="#ede9fe" stroke="#7c3aed"/>
+  <text x="1235" y="692" text-anchor="middle" class="label">OCI Queue</text>
+  <text x="1235" y="718" text-anchor="middle" class="sub">events</text>
+  <g>
+    <ellipse cx="1235" cy="790" rx="75" ry="18" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+    <rect x="1160" y="790" width="150" height="50" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+    <ellipse cx="1235" cy="840" rx="75" ry="18" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+    <text x="1235" y="815" text-anchor="middle" class="label">OCI NoSQL</text>
+    <text x="1235" y="839" text-anchor="middle" class="sub">analytics</text>
+  </g>
+
+  <path d="M190 320 L240 315" class="edge" stroke="#334155" marker-end="url(#arrow-slate)"/>
+  <path d="M390 315 L430 320" class="edge" stroke="#334155" marker-end="url(#arrow-slate)"/>
+  <path d="M580 300 L650 267" class="edge" stroke="#2563eb" marker-end="url(#arrow-blue)"/>
+  <text x="595" y="282" class="edge-label">/auth</text>
+  <path d="M580 326 L650 370" class="edge" stroke="#2563eb" marker-end="url(#arrow-blue)"/>
+  <text x="594" y="358" class="edge-label">/flags</text>
+  <path d="M560 360 L650 475" class="edge" stroke="#2563eb" marker-end="url(#arrow-blue)"/>
+  <text x="568" y="430" class="edge-label">/targeting</text>
+  <path d="M580 320 L860 370" class="edge" stroke="#2563eb" marker-end="url(#arrow-blue)"/>
+  <text x="760" y="345" class="edge-label">/evaluate</text>
+
+  <path d="M810 267 L1160 270" class="edge" stroke="#dc2626" marker-end="url(#arrow-red)"/>
+  <path d="M810 372 L1160 375" class="edge" stroke="#dc2626" marker-end="url(#arrow-red)"/>
+  <path d="M810 477 L1160 480" class="edge" stroke="#dc2626" marker-end="url(#arrow-red)"/>
+  <path d="M1020 372 L1160 585" class="edge" stroke="#b91c1c" marker-end="url(#arrow-red)"/>
+  <text x="1080" y="500" class="edge-label">cache</text>
+  <path d="M1020 390 L1160 695" class="edge" stroke="#7c3aed" marker-end="url(#arrow-purple)"/>
+  <text x="1086" y="640" class="edge-label">produz eventos</text>
+  <path d="M1160 695 L1020 600" class="edge" stroke="#7c3aed" marker-end="url(#arrow-purple)"/>
+  <text x="1056" y="646" class="edge-label">consome</text>
+  <path d="M1020 625 L1160 815" class="edge" stroke="#0284c7" marker-end="url(#arrow-cyan)"/>
+  <text x="1080" y="755" class="edge-label">persiste</text>
+  <path d="M860 360 L810 372" class="edge dashed" stroke="#16a34a" marker-end="url(#arrow-green)"/>
+  <path d="M860 385 L810 475" class="edge dashed" stroke="#16a34a" marker-end="url(#arrow-green)"/>
+  <path d="M1140 145 L1060 200" class="edge dashed" stroke="#d97706" marker-end="url(#arrow-amber)"/>
+  <text x="1068" y="152" class="edge-label">imagens</text>
+</svg>

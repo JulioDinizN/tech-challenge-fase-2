@@ -1,0 +1,109 @@
+<mxfile host="app.diagrams.net" modified="2026-06-14T00:00:00.000Z" agent="Codex" version="24.7.17">
+  <diagram id="overall-architecture" name="overall-architecture">
+    <mxGraphModel dx="1600" dy="980" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="980" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="oci" value="Oracle Cloud Infrastructure" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#334155;dashed=1;verticalAlign=top;spacingTop=12;fontStyle=1;fontSize=20;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="210" y="50" width="1290" height="840" as="geometry" />
+        </mxCell>
+        <mxCell id="oke" value="OKE - Kubernetes Cluster&#xa;Namespace: togglemaster" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eef6ff;strokeColor=#2563eb;verticalAlign=top;spacingTop=12;fontStyle=1;fontSize=18;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="360" y="170" width="700" height="580" as="geometry" />
+        </mxCell>
+        <mxCell id="client" value="Usuário / Cliente&#xa;curl, Postman, navegador" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#475569;fontStyle=1;fontSize=16;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="40" y="280" width="150" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="lb" value="OCI Load Balancer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#ea580c;fontStyle=1;fontSize=16;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="240" y="280" width="150" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ingress" value="Nginx Ingress&#xa;Controller" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#2563eb;fontStyle=1;fontSize=16;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="430" y="280" width="150" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ocir" value="OCIR&#xa;Container Registry&#xa;5 service images" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#d97706;fontStyle=1;fontSize=16;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="100" width="210" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="auth" value="auth-service&#xa;Go API keys" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontStyle=1;fontSize=16;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="650" y="230" width="160" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="flag" value="flag-service&#xa;Feature flags CRUD" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontStyle=1;fontSize=16;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="650" y="335" width="160" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="targeting" value="targeting-service&#xa;Targeting rules" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontStyle=1;fontSize=16;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="650" y="440" width="160" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="evaluation" value="evaluation-service&#xa;Hot path /evaluate" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontStyle=1;fontSize=16;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="860" y="335" width="160" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="analytics" value="analytics-service&#xa;Event consumer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontStyle=1;fontSize=16;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="860" y="565" width="160" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="pg-auth" value="PostgreSQL&#xa;auth DB" style="shape=cylinder3d;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#fef2f2;strokeColor=#dc2626;fontStyle=1;fontSize=16;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="230" width="150" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="pg-flag" value="PostgreSQL&#xa;flags DB" style="shape=cylinder3d;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#fef2f2;strokeColor=#dc2626;fontStyle=1;fontSize=16;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="335" width="150" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="pg-targeting" value="PostgreSQL&#xa;targeting DB" style="shape=cylinder3d;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#fef2f2;strokeColor=#dc2626;fontStyle=1;fontSize=16;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="440" width="150" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="redis" value="Redis&#xa;evaluation cache" style="shape=cylinder3d;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#fee2e2;strokeColor=#b91c1c;fontStyle=1;fontSize=16;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="545" width="150" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="queue" value="OCI Queue&#xa;evaluation events" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7c3aed;fontStyle=1;fontSize=16;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="660" width="150" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="nosql" value="OCI NoSQL&#xa;analytics table" style="shape=cylinder3d;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#e0f2fe;strokeColor=#0284c7;fontStyle=1;fontSize=16;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="775" width="150" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="e-client-lb" value="" style="endArrow=block;html=1;rounded=0;strokeWidth=2;strokeColor=#334155;" edge="1" parent="1" source="client" target="lb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-lb-ingress" value="" style="endArrow=block;html=1;rounded=0;strokeWidth=2;strokeColor=#334155;" edge="1" parent="1" source="lb" target="ingress">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-ingress-auth" value="/auth" style="endArrow=block;html=1;rounded=0;strokeWidth=2;strokeColor=#2563eb;fontSize=12;" edge="1" parent="1" source="ingress" target="auth">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-ingress-flag" value="/flags" style="endArrow=block;html=1;rounded=0;strokeWidth=2;strokeColor=#2563eb;fontSize=12;" edge="1" parent="1" source="ingress" target="flag">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-ingress-targeting" value="/targeting" style="endArrow=block;html=1;rounded=0;strokeWidth=2;strokeColor=#2563eb;fontSize=12;" edge="1" parent="1" source="ingress" target="targeting">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-ingress-evaluation" value="/evaluate" style="endArrow=block;html=1;rounded=0;strokeWidth=2;strokeColor=#2563eb;fontSize=12;" edge="1" parent="1" source="ingress" target="evaluation">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-auth-pg" value="" style="endArrow=block;html=1;rounded=0;strokeWidth=2;strokeColor=#dc2626;" edge="1" parent="1" source="auth" target="pg-auth">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-flag-pg" value="" style="endArrow=block;html=1;rounded=0;strokeWidth=2;strokeColor=#dc2626;" edge="1" parent="1" source="flag" target="pg-flag">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-targeting-pg" value="" style="endArrow=block;html=1;rounded=0;strokeWidth=2;strokeColor=#dc2626;" edge="1" parent="1" source="targeting" target="pg-targeting">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-evaluation-redis" value="cache" style="endArrow=block;html=1;rounded=0;strokeWidth=2;strokeColor=#b91c1c;fontSize=12;" edge="1" parent="1" source="evaluation" target="redis">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-evaluation-queue" value="produz eventos" style="endArrow=block;html=1;rounded=0;strokeWidth=2;strokeColor=#7c3aed;fontSize=12;" edge="1" parent="1" source="evaluation" target="queue">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-queue-analytics" value="consome" style="endArrow=block;html=1;rounded=0;strokeWidth=2;strokeColor=#7c3aed;fontSize=12;" edge="1" parent="1" source="queue" target="analytics">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-analytics-nosql" value="persiste" style="endArrow=block;html=1;rounded=0;strokeWidth=2;strokeColor=#0284c7;fontSize=12;" edge="1" parent="1" source="analytics" target="nosql">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-evaluation-flag" value="consulta flags" style="endArrow=block;html=1;rounded=0;strokeWidth=2;strokeColor=#16a34a;fontSize=12;dashed=1;" edge="1" parent="1" source="evaluation" target="flag">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-evaluation-targeting" value="consulta regras" style="endArrow=block;html=1;rounded=0;strokeWidth=2;strokeColor=#16a34a;fontSize=12;dashed=1;" edge="1" parent="1" source="evaluation" target="targeting">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-ocir-oke" value="images" style="endArrow=block;html=1;rounded=0;strokeWidth=2;strokeColor=#d97706;fontSize=12;dashed=1;" edge="1" parent="1" source="ocir" target="oke">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -2,6 +2,11 @@
 
 High-level architecture notes for the final report.
 
+## Diagram
+
+- Editable draw.io source: `docs/diagrams/overall-architecture.drawio`
+- Report image export: `docs/diagrams/overall-architecture.png`
+
 ## Services
 
 - `auth-service`: API key and authentication service.
