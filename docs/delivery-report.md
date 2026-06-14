@@ -21,7 +21,7 @@ Keep this Markdown file as a working draft and use `docs/report.html` for the su
 - Participante: Julio Cesar Diniz Nogueira
 - E-mail: juliocesardiniznogueira@gmail.com
 - Matrícula: RM373719
-- Discord: TODO
+- Discord: Júlio César - RM373719
 
 ## Repository
 
