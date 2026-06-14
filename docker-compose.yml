@@ -1,17 +1,156 @@
-# TODO: Implement the local 9-container environment required by the challenge.
-#
-# Expected local shape:
-# - 5 app containers:
-#   - auth-service
-#   - flag-service
-#   - targeting-service
-#   - evaluation-service
-#   - analytics-service
-# - 4 dependency containers:
-#   - PostgreSQL for auth-service
-#   - PostgreSQL for flag-service and targeting-service local databases
-#   - Redis for evaluation-service
-#   - Local NoSQL/analytics dependency for analytics-service
-#
-# We will fill this file after the service Dockerfiles are in place.
-services: {}
+services:
+  auth-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: ${POSTGRES_USER:-togglemaster}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-togglemaster_local_password}
+    ports:
+      - "5433:5432"
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+      - ./services/auth-service/db/init.sql:/docker-entrypoint-initdb.d/01-auth-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  app-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: flags_db
+      POSTGRES_USER: ${POSTGRES_USER:-togglemaster}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-togglemaster_local_password}
+    ports:
+      - "5434:5432"
+    volumes:
+      - app-db-data:/var/lib/postgresql/data
+      - ./docker/postgres/app-db-init.sql:/docker-entrypoint-initdb.d/01-app-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d flags_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  dynamodb-local:
+    image: amazon/dynamodb-local:2.5.4
+    command: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-inMemory"]
+    ports:
+      - "8000:8000"
+
+  auth-service:
+    build:
+      context: ./services/auth-service
+    environment:
+      PORT: "8001"
+      DATABASE_URL: postgres://${POSTGRES_USER:-togglemaster}:${POSTGRES_PASSWORD:-togglemaster_local_password}@auth-db:5432/auth_db?sslmode=disable
+      MASTER_KEY: ${MASTER_KEY:-admin-secreto-123}
+      BOOTSTRAP_API_KEY: ${BOOTSTRAP_API_KEY:-tm_key_local_development_only}
+      BOOTSTRAP_API_KEY_NAME: local-compose-service-key
+    ports:
+      - "8001:8001"
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8001/health >/dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  flag-service:
+    build:
+      context: ./services/flag-service
+    environment:
+      PORT: "8002"
+      DATABASE_URL: postgres://${POSTGRES_USER:-togglemaster}:${POSTGRES_PASSWORD:-togglemaster_local_password}@app-db:5432/flags_db?sslmode=disable
+      AUTH_SERVICE_URL: http://auth-service:8001
+    ports:
+      - "8002:8002"
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      app-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8002/health', timeout=3)\""]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  targeting-service:
+    build:
+      context: ./services/targeting-service
+    environment:
+      PORT: "8003"
+      DATABASE_URL: postgres://${POSTGRES_USER:-togglemaster}:${POSTGRES_PASSWORD:-togglemaster_local_password}@app-db:5432/targeting_db?sslmode=disable
+      AUTH_SERVICE_URL: http://auth-service:8001
+    ports:
+      - "8003:8003"
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      app-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8003/health', timeout=3)\""]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  evaluation-service:
+    build:
+      context: ./services/evaluation-service
+    environment:
+      PORT: "8004"
+      REDIS_URL: redis://redis:6379
+      FLAG_SERVICE_URL: http://flag-service:8002
+      TARGETING_SERVICE_URL: http://targeting-service:8003
+      SERVICE_API_KEY: ${SERVICE_API_KEY:-tm_key_local_development_only}
+      AWS_EC2_METADATA_DISABLED: "true"
+    ports:
+      - "8004:8004"
+    depends_on:
+      flag-service:
+        condition: service_healthy
+      targeting-service:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8004/health >/dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  analytics-service:
+    build:
+      context: ./services/analytics-service
+    environment:
+      PORT: "8005"
+      ANALYTICS_WORKER_ENABLED: ${ANALYTICS_WORKER_ENABLED:-false}
+      AWS_EC2_METADATA_DISABLED: "true"
+    ports:
+      - "8005:8005"
+    depends_on:
+      - dynamodb-local
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8005/health', timeout=3)\""]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  auth-db-data:
+  app-db-data:

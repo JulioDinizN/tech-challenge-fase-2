@@ -1,0 +1,114 @@
+# Local Development
+
+## Start The Stack
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+For detached execution:
+
+```bash
+docker compose up -d --build
+docker compose ps
+```
+
+Expected local shape:
+
+- 5 application containers:
+  - `auth-service`
+  - `flag-service`
+  - `targeting-service`
+  - `evaluation-service`
+  - `analytics-service`
+- 4 dependency containers:
+  - `auth-db`
+  - `app-db`
+  - `redis`
+  - `dynamodb-local`
+
+## Local Ports
+
+| Component | URL |
+| --- | --- |
+| auth-service | http://localhost:8001 |
+| flag-service | http://localhost:8002 |
+| targeting-service | http://localhost:8003 |
+| evaluation-service | http://localhost:8004 |
+| analytics-service | http://localhost:8005 |
+| DynamoDB Local | http://localhost:8000 |
+| auth-db PostgreSQL | localhost:5433 |
+| app-db PostgreSQL | localhost:5434 |
+| Redis | localhost:6379 |
+
+## Health Checks
+
+If direct host curls are available:
+
+```bash
+curl http://localhost:8001/health
+curl http://localhost:8002/health
+curl http://localhost:8003/health
+curl http://localhost:8004/health
+curl http://localhost:8005/health
+```
+
+If host networking is restricted, verify through Compose:
+
+```bash
+docker compose exec -T auth-service wget -qO- http://localhost:8001/health
+docker compose exec -T flag-service python -c "import urllib.request; print(urllib.request.urlopen('http://localhost:8002/health', timeout=3).read().decode())"
+docker compose exec -T targeting-service python -c "import urllib.request; print(urllib.request.urlopen('http://localhost:8003/health', timeout=3).read().decode())"
+docker compose exec -T evaluation-service wget -qO- http://localhost:8004/health
+docker compose exec -T analytics-service python -c "import urllib.request; print(urllib.request.urlopen('http://localhost:8005/health', timeout=3).read().decode())"
+```
+
+## Smoke Test
+
+The local Compose stack seeds the API key from `.env.example`:
+
+```text
+tm_key_local_development_only
+```
+
+Run this from the repository root:
+
+```bash
+docker compose exec -T flag-service python - <<'PY'
+import requests
+
+api_key = 'tm_key_local_development_only'
+headers = {'Authorization': f'Bearer {api_key}', 'Content-Type': 'application/json'}
+flag_name = 'enable-compose-demo'
+
+validate = requests.get('http://auth-service:8001/validate', headers={'Authorization': f'Bearer {api_key}'}, timeout=5)
+print('auth validate', validate.status_code, validate.text.strip())
+
+flag_payload = {'name': flag_name, 'description': 'Docker Compose smoke test flag', 'is_enabled': True}
+flag = requests.post('http://localhost:8002/flags', json=flag_payload, headers=headers, timeout=5)
+if flag.status_code == 409:
+    flag = requests.put(f'http://localhost:8002/flags/{flag_name}', json={'description': flag_payload['description'], 'is_enabled': True}, headers=headers, timeout=5)
+print('flag upsert', flag.status_code, flag.text.strip())
+
+rule_payload = {'flag_name': flag_name, 'is_enabled': True, 'rules': {'type': 'PERCENTAGE', 'value': 100}}
+rule = requests.post('http://targeting-service:8003/rules', json=rule_payload, headers=headers, timeout=5)
+if rule.status_code == 409:
+    rule = requests.put(f'http://targeting-service:8003/rules/{flag_name}', json={'is_enabled': True, 'rules': rule_payload['rules']}, headers=headers, timeout=5)
+print('rule upsert', rule.status_code, rule.text.strip())
+
+evaluation = requests.get(f'http://evaluation-service:8004/evaluate?user_id=compose-user&flag_name={flag_name}', timeout=5)
+print('evaluation', evaluation.status_code, evaluation.text.strip())
+PY
+```
+
+Expected result:
+
+- API key validates with status `200`.
+- Flag create/update succeeds.
+- Targeting rule create/update succeeds.
+- Evaluation returns status `200` with `"result": true`.
+
+## Local Analytics Note
+
+`analytics-service` runs locally with `ANALYTICS_WORKER_ENABLED=false` so the required 9-container stack can start without a local queue emulator. DynamoDB Local is still included as the required local NoSQL dependency. Queue and NoSQL provider integration will be completed in the OCI cloud integration requirement.

@@ -2,12 +2,11 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 
-	"github.com/jackc/pgx/v4/stdlib"
+	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/joho/godotenv"
 )
 
@@ -44,6 +43,10 @@ func main() {
 	}
 	defer db.Close()
 
+	if err := bootstrapAPIKey(db); err != nil {
+		log.Fatalf("Não foi possível criar a chave inicial da API: %v", err)
+	}
+
 	app := &App{
 		DB:         db,
 		MasterKey:  masterKey,
@@ -79,4 +82,28 @@ func connectDB(databaseURL string) (*sql.DB, error) {
 
 	log.Println("Conectado ao PostgreSQL com sucesso!")
 	return db, nil
+}
+
+func bootstrapAPIKey(db *sql.DB) error {
+	bootstrapKey := os.Getenv("BOOTSTRAP_API_KEY")
+	if bootstrapKey == "" {
+		return nil
+	}
+
+	keyName := os.Getenv("BOOTSTRAP_API_KEY_NAME")
+	if keyName == "" {
+		keyName = "bootstrap-service-key"
+	}
+
+	_, err := db.Exec(
+		"INSERT INTO api_keys (name, key_hash) VALUES ($1, $2) ON CONFLICT (key_hash) DO NOTHING",
+		keyName,
+		hashAPIKey(bootstrapKey),
+	)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Chave inicial da API disponível (Name: %s)", keyName)
+	return nil
 }

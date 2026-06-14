@@ -4,12 +4,16 @@ Track the challenge requirements here as we implement them one by one.
 
 ## 1. Analysis and containerization
 
-- [ ] Dockerfile for auth-service
-- [ ] Dockerfile for flag-service
-- [ ] Dockerfile for targeting-service
-- [ ] Dockerfile for evaluation-service
-- [ ] Dockerfile for analytics-service
-- [ ] Root Docker Compose with 5 services and 4 local dependencies
+- [x] Dockerfile for auth-service
+- [x] Dockerfile for flag-service
+- [x] Dockerfile for targeting-service
+- [x] Dockerfile for evaluation-service
+- [x] Dockerfile for analytics-service
+- [x] Root Docker Compose with 5 services and 4 local dependencies
+- [x] Local health checks for all five app services
+- [x] Local smoke test for auth, flag, targeting, and evaluation flow
+- [ ] Local analytics queue/NoSQL flow
+  - Note: local Compose runs DynamoDB Local to satisfy the 9-container requirement, while the analytics worker is disabled until the queue/NoSQL provider adaptation requirement is implemented.
 
 ## 2. Cloud infrastructure
 

@@ -10,7 +10,7 @@ This repository is organized to follow the Tech Challenge requirements one by on
 .
 |-- services/                 # Imported application source code
 |-- docker/                   # Docker notes and shared containerization decisions
-|-- docker-compose.yml        # Local 9-container environment, to be implemented
+|-- docker-compose.yml        # Local 9-container environment
 |-- k8s/                      # Kubernetes manifests
 |   |-- base/                 # Common manifests
 |   `-- overlays/             # Environment-specific values
@@ -30,6 +30,23 @@ This repository is organized to follow the Tech Challenge requirements one by on
 5. Create Kubernetes manifests for deployments, services, secrets, config maps, ingress, and autoscaling.
 6. Validate scaling and data persistence.
 7. Finish the report and video evidence.
+
+## Local execution
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+The local stack runs the challenge-required shape:
+
+- 5 application containers
+- 4 dependency containers:
+  - 2 PostgreSQL containers
+  - 1 Redis container
+  - 1 DynamoDB Local container
+
+See `docs/local-development.md` for smoke-test commands.
 
 ## Imported services
 

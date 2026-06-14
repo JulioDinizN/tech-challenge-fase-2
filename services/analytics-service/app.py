@@ -18,27 +18,36 @@ log = logging.getLogger(__name__)
 load_dotenv()
 
 # --- Configuração ---
+WORKER_ENABLED = os.getenv("ANALYTICS_WORKER_ENABLED", "true").lower() not in ("0", "false", "no")
 AWS_REGION = os.getenv("AWS_REGION")
 SQS_QUEUE_URL = os.getenv("AWS_SQS_URL")
 DYNAMODB_TABLE_NAME = os.getenv("AWS_DYNAMODB_TABLE")
+DYNAMODB_ENDPOINT_URL = os.getenv("DYNAMODB_ENDPOINT_URL")
+SQS_ENDPOINT_URL = os.getenv("SQS_ENDPOINT_URL")
 
-if not all([AWS_REGION, SQS_QUEUE_URL, DYNAMODB_TABLE_NAME]):
+if WORKER_ENABLED and not all([AWS_REGION, SQS_QUEUE_URL, DYNAMODB_TABLE_NAME]):
     log.critical("Erro: AWS_REGION, AWS_SQS_URL, e AWS_DYNAMODB_TABLE devem ser definidos.")
     sys.exit(1)
 
 # --- Clientes Boto3 ---
 # Criamos a sessão uma vez
-try:
-    session = boto3.Session(region_name=AWS_REGION)
-    sqs_client = session.client("sqs")
-    dynamodb_client = session.client("dynamodb")
-    log.info(f"Clientes Boto3 inicializados na região {AWS_REGION}")
-except NoCredentialsError:
-    log.critical("Credenciais da AWS não encontradas. Verifique seu ambiente.")
-    sys.exit(1)
-except Exception as e:
-    log.critical(f"Erro ao inicializar o Boto3: {e}")
-    sys.exit(1)
+sqs_client = None
+dynamodb_client = None
+
+if WORKER_ENABLED:
+    try:
+        session = boto3.Session(region_name=AWS_REGION)
+        sqs_client = session.client("sqs", endpoint_url=SQS_ENDPOINT_URL)
+        dynamodb_client = session.client("dynamodb", endpoint_url=DYNAMODB_ENDPOINT_URL)
+        log.info(f"Clientes Boto3 inicializados na região {AWS_REGION}")
+    except NoCredentialsError:
+        log.critical("Credenciais da AWS não encontradas. Verifique seu ambiente.")
+        sys.exit(1)
+    except Exception as e:
+        log.critical(f"Erro ao inicializar o Boto3: {e}")
+        sys.exit(1)
+else:
+    log.info("Worker de analytics desabilitado para execução local.")
 
 
 # --- SQS Worker ---
@@ -121,12 +130,15 @@ app = Flask(__name__)
 @app.route('/health')
 def health():
     # Uma verificação de saúde real poderia checar a conexão com o DynamoDB/SQS
-    return jsonify({"status": "ok"})
+    return jsonify({"status": "ok", "worker_enabled": WORKER_ENABLED})
 
 # --- Inicialização ---
 
 def start_worker():
     """ Inicia o worker SQS em uma thread separada """
+    if not WORKER_ENABLED:
+        return
+
     worker_thread = threading.Thread(target=sqs_worker_loop, daemon=True)
     worker_thread.start()
 
