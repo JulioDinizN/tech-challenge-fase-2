@@ -1,146 +1,226 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1250" viewBox="0 0 1900 1250" role="img" aria-labelledby="title desc">
   <title id="title">Arquitetura geral do ToggleMaster na Oracle Cloud Infrastructure</title>
-  <desc id="desc">Diagrama com cliente, OCI Load Balancer, Nginx Ingress em OKE, cinco microsserviços, OCIR, PostgreSQL, Redis, OCI Queue e OCI NoSQL.</desc>
+  <desc id="desc">Diagrama com cliente externo, OCI Load Balancer, OKE, Nginx Ingress, microsserviços, OCIR, PostgreSQL, Redis, OCI Queue e OCI NoSQL.</desc>
   <defs>
-    <marker id="arrow-slate" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="arrow-slate" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
     </marker>
-    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
     </marker>
-    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#16a34a"/>
     </marker>
-    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/>
     </marker>
-    <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/>
     </marker>
-    <marker id="arrow-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="arrow-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#0284c7"/>
     </marker>
-    <marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#d97706"/>
     </marker>
+    <filter id="soft-shadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.10"/>
+    </filter>
+    <symbol id="icon-nginx" viewBox="0 0 24 24">
+      <path d="M12 0L1.605 6v12L12 24l10.395-6V6L12 0zm6 16.59c0 .705-.646 1.29-1.529 1.29-.631 0-1.351-.255-1.801-.81l-6-7.141v6.66c0 .721-.57 1.29-1.274 1.29H7.32c-.721 0-1.29-.6-1.29-1.29V7.41c0-.705.63-1.29 1.5-1.29.646 0 1.38.255 1.83.81l5.97 7.141V7.41c0-.721.6-1.29 1.29-1.29h.075c.72 0 1.29.6 1.29 1.29v9.18H18z"/>
+    </symbol>
+    <symbol id="icon-postgresql" viewBox="0 0 24 24">
+      <path d="M23.5594 14.7228a.5269.5269 0 0 0-.0563-.1191c-.139-.2632-.4768-.3418-1.0074-.2321-1.6533.3411-2.2935.1312-2.5256-.0191 1.342-2.0482 2.445-4.522 3.0411-6.8297.2714-1.0507.7982-3.5237.1222-4.7316a1.5641 1.5641 0 0 0-.1509-.235C21.6931.9086 19.8007.0248 17.5099.0005c-1.4947-.0158-2.7705.3461-3.1161.4794a9.449 9.449 0 0 0-.5159-.0816 8.044 8.044 0 0 0-1.3114-.1278c-1.1822-.0184-2.2038.2642-3.0498.8406-.8573-.3211-4.7888-1.645-7.2219.0788C.9359 2.1526.3086 3.8733.4302 6.3043c.0409.818.5069 3.334 1.2423 5.7436.4598 1.5065.9387 2.7019 1.4334 3.582.553.9942 1.1259 1.5933 1.7143 1.7895.4474.1491 1.1327.1441 1.8581-.7279.8012-.9635 1.5903-1.8258 1.9446-2.2069.4351.2355.9064.3625 1.39.3772a.0569.0569 0 0 0 .0004.0041 11.0312 11.0312 0 0 0-.2472.3054c-.3389.4302-.4094.5197-1.5002.7443-.3102.064-1.1344.2339-1.1464.8115-.0025.1224.0329.2309.0919.3268.2269.4231.9216.6097 1.015.6331 1.3345.3335 2.5044.092 3.3714-.6787-.017 2.231.0775 4.4174.3454 5.0874.2212.5529.7618 1.9045 2.4692 1.9043.2505 0 .5263-.0291.8296-.0941 1.7819-.3821 2.5557-1.1696 2.855-2.9059.1503-.8707.4016-2.8753.5388-4.1012.0169-.0703.0357-.1207.057-.1362.0007-.0005.0697-.0471.4272.0307a.3673.3673 0 0 0 .0443.0068l.2539.0223.0149.001c.8468.0384 1.9114-.1426 2.5312-.4308.6438-.2988 1.8057-1.0323 1.5951-1.6698zM2.371 11.8765c-.7435-2.4358-1.1779-4.8851-1.2123-5.5719-.1086-2.1714.4171-3.6829 1.5623-4.4927 1.8367-1.2986 4.8398-.5408 6.108-.13-.0032.0032-.0066.0061-.0098.0094-2.0238 2.044-1.9758 5.536-1.9708 5.7495-.0002.0823.0066.1989.0162.3593.0348.5873.0996 1.6804-.0735 2.9184-.1609 1.1504.1937 2.2764.9728 3.0892.0806.0841.1648.1631.2518.2374-.3468.3714-1.1004 1.1926-1.9025 2.1576-.5677.6825-.9597.5517-1.0886.5087-.3919-.1307-.813-.5871-1.2381-1.3223-.4796-.839-.9635-2.0317-1.4155-3.5126zm6.0072 5.0871c-.1711-.0428-.3271-.1132-.4322-.1772.0889-.0394.2374-.0902.4833-.1409 1.2833-.2641 1.4815-.4506 1.9143-1.0002.0992-.126.2116-.2687.3673-.4426a.3549.3549 0 0 0 .0737-.1298c.1708-.1513.2724-.1099.4369-.0417.156.0646.3078.26.3695.4752.0291.1016.0619.2945-.0452.4444-.9043 1.2658-2.2216 1.2494-3.1676 1.0128zm2.094-3.988-.0525.141c-.133.3566-.2567.6881-.3334 1.003-.6674-.0021-1.3168-.2872-1.8105-.8024-.6279-.6551-.9131-1.5664-.7825-2.5004.1828-1.3079.1153-2.4468.079-3.0586-.005-.0857-.0095-.1607-.0122-.2199.2957-.2621 1.6659-.9962 2.6429-.7724.4459.1022.7176.4057.8305.928.5846 2.7038.0774 3.8307-.3302 4.7363-.084.1866-.1633.3629-.2311.5454zm7.3637 4.5725c-.0169.1768-.0358.376-.0618.5959l-.146.4383a.3547.3547 0 0 0-.0182.1077c-.0059.4747-.054.6489-.115.8693-.0634.2292-.1353.4891-.1794 1.0575-.11 1.4143-.8782 2.2267-2.4172 2.5565-1.5155.3251-1.7843-.4968-2.0212-1.2217a6.5824 6.5824 0 0 0-.0769-.2266c-.2154-.5858-.1911-1.4119-.1574-2.5551.0165-.5612-.0249-1.9013-.3302-2.6462.0044-.2932.0106-.5909.019-.8918a.3529.3529 0 0 0-.0153-.1126 1.4927 1.4927 0 0 0-.0439-.208c-.1226-.4283-.4213-.7866-.7797-.9351-.1424-.059-.4038-.1672-.7178-.0869.067-.276.1831-.5875.309-.9249l.0529-.142c.0595-.16.134-.3257.213-.5012.4265-.9476 1.0106-2.2453.3766-5.1772-.2374-1.0981-1.0304-1.6343-2.2324-1.5098-.7207.0746-1.3799.3654-1.7088.5321a5.6716 5.6716 0 0 0-.1958.1041c.0918-1.1064.4386-3.1741 1.7357-4.4823a4.0306 4.0306 0 0 1 .3033-.276.3532.3532 0 0 0 .1447-.0644c.7524-.5706 1.6945-.8506 2.802-.8325.4091.0067.8017.0339 1.1742.081 1.939.3544 3.2439 1.4468 4.0359 2.3827.8143.9623 1.2552 1.9315 1.4312 2.4543-1.3232-.1346-2.2234.1268-2.6797.779-.9926 1.4189.543 4.1729 1.2811 5.4964.1353.2426.2522.4522.2889.5413.2403.5825.5515.9713.7787 1.2552.0696.087.1372.1714.1885.245-.4008.1155-1.1208.3825-1.0552 1.717-.0123.1563-.0423.4469-.0834.8148-.0461.2077-.0702.4603-.0994.7662zm.8905-1.6211c-.0405-.8316.2691-.9185.5967-1.0105a2.8566 2.8566 0 0 0 .135-.0406 1.202 1.202 0 0 0 .1342.103c.5703.3765 1.5823.4213 3.0068.1344-.2016.1769-.5189.3994-.9533.6011-.4098.1903-1.0957.333-1.7473.3636-.7197.0336-1.0859-.0807-1.1721-.151zm.5695-9.2712c-.0059.3508-.0542.6692-.1054 1.0017-.055.3576-.112.7274-.1264 1.1762-.0142.4368.0404.8909.0932 1.3301.1066.887.216 1.8003-.2075 2.7014a3.5272 3.5272 0 0 1-.1876-.3856c-.0527-.1276-.1669-.3326-.3251-.6162-.6156-1.1041-2.0574-3.6896-1.3193-4.7446.3795-.5427 1.3408-.5661 2.1781-.463zm.2284 7.0137a12.3762 12.3762 0 0 0-.0853-.1074l-.0355-.0444c.7262-1.1995.5842-2.3862.4578-3.4385-.0519-.4318-.1009-.8396-.0885-1.2226.0129-.4061.0666-.7543.1185-1.0911.0639-.415.1288-.8443.1109-1.3505.0134-.0531.0188-.1158.0118-.1902-.0457-.4855-.5999-1.938-1.7294-3.253-.6076-.7073-1.4896-1.4972-2.6889-2.0395.5251-.1066 1.2328-.2035 2.0244-.1859 2.0515.0456 3.6746.8135 4.8242 2.2824a.908.908 0 0 1 .0667.1002c.7231 1.3556-.2762 6.2751-2.9867 10.5405zm-8.8166-6.1162c-.025.1794-.3089.4225-.6211.4225a.5821.5821 0 0 1-.0809-.0056c-.1873-.026-.3765-.144-.5059-.3156-.0458-.0605-.1203-.178-.1055-.2844.0055-.0401.0261-.0985.0925-.1488.1182-.0894.3518-.1226.6096-.0867.3163.0441.6426.1938.6113.4186zm7.9305-.4114c.0111.0792-.049.201-.1531.3102-.0683.0717-.212.1961-.4079.2232a.5456.5456 0 0 1-.075.0052c-.2935 0-.5414-.2344-.5607-.3717-.024-.1765.2641-.3106.5611-.352.297-.0414.6111.0088.6356.1851z"/>
+    </symbol>
     <style>
       text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; fill: #0f172a; }
-      .title { font-size: 24px; font-weight: 800; }
-      .label { font-size: 20px; font-weight: 800; }
-      .sub { font-size: 16px; fill: #475569; }
-      .edge-label { font-size: 14px; fill: #334155; font-weight: 700; }
-      .box { rx: 12; ry: 12; stroke-width: 2; }
-      .edge { fill: none; stroke-width: 3; }
+      .page-title { font-size: 29px; font-weight: 800; }
+      .page-subtitle { font-size: 15px; fill: #64748b; font-weight: 650; }
+      .zone-title { font-size: 21px; font-weight: 800; }
+      .zone-subtitle { font-size: 14px; fill: #64748b; font-weight: 650; }
+      .card-title { font-size: 18px; font-weight: 800; }
+      .card-subtitle { font-size: 13px; fill: #475569; font-weight: 650; }
+      .edge-label { font-size: 13px; fill: #334155; font-weight: 800; paint-order: stroke; stroke: #ffffff; stroke-width: 6px; stroke-linejoin: round; }
+      .legend-text { font-size: 14px; fill: #475569; font-weight: 750; }
+      .card { rx: 14; ry: 14; stroke-width: 2.4; filter: url(#soft-shadow); }
+      .zone { rx: 22; ry: 22; stroke-width: 2.4; }
+      .edge { fill: none; stroke-width: 3.3; stroke-linecap: round; stroke-linejoin: round; }
+      .thin-edge { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
       .dashed { stroke-dasharray: 10 8; }
+      .icon-stroke { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2.8; }
     </style>
   </defs>
-  <rect x="0" y="0" width="1600" height="980" fill="#ffffff"/>
-  <rect x="210" y="50" width="1290" height="840" rx="18" fill="#f8fafc" stroke="#334155" stroke-width="2" stroke-dasharray="12 10"/>
-  <text x="235" y="88" class="title">Oracle Cloud Infrastructure</text>
-  <rect x="360" y="170" width="700" height="580" rx="16" fill="#eef6ff" stroke="#2563eb" stroke-width="3"/>
-  <text x="390" y="208" class="title">OKE - Kubernetes Cluster</text>
-  <text x="390" y="232" class="sub">Namespace: togglemaster</text>
 
-  <rect x="40" y="280" width="150" height="80" class="box" fill="#ffffff" stroke="#475569"/>
-  <text x="115" y="312" text-anchor="middle" class="label">Usuário</text>
-  <text x="115" y="338" text-anchor="middle" class="sub">curl / Postman</text>
+  <rect x="0" y="0" width="1900" height="1250" fill="#ffffff"/>
 
-  <rect x="240" y="280" width="150" height="70" class="box" fill="#fff7ed" stroke="#ea580c"/>
-  <text x="315" y="309" text-anchor="middle" class="label">OCI Load</text>
-  <text x="315" y="334" text-anchor="middle" class="label">Balancer</text>
+  <rect x="220" y="72" width="1625" height="1120" class="zone" fill="#f8fafc" stroke="#334155" stroke-dasharray="15 11"/>
+  <path d="M252 132h70c13 0 23-9 23-22s-10-23-23-23c-2 0-5 0-7 1-8-14-22-22-39-22-22 0-40 16-42 37-13 3-22 14-22 29 0 17 14 31 31 31h79" fill="#ffffff" stroke="#334155" stroke-width="3.2" stroke-linejoin="round"/>
+  <text x="370" y="111" class="page-title">Arquitetura geral - ToggleMaster na Oracle Cloud Infrastructure</text>
+  <text x="370" y="143" class="page-subtitle">Fluxo de APIs, workloads no OKE, serviços gerenciados OCI e trilha assíncrona de analytics.</text>
 
-  <rect x="430" y="280" width="150" height="80" class="box" fill="#dbeafe" stroke="#2563eb"/>
-  <text x="505" y="312" text-anchor="middle" class="label">Nginx</text>
-  <text x="505" y="338" text-anchor="middle" class="label">Ingress</text>
+  <rect x="45" y="500" width="150" height="175" class="card" fill="#ffffff" stroke="#475569"/>
+  <g transform="translate(79 530)">
+    <rect x="0" y="0" width="82" height="55" rx="7" fill="#f8fafc" stroke="#475569" stroke-width="3"/>
+    <path d="M28 69h26M41 55v14M13 13h56M13 27h38" class="icon-stroke" stroke="#475569"/>
+  </g>
+  <text x="120" y="625" text-anchor="middle" class="card-title">Cliente</text>
+  <text x="120" y="650" text-anchor="middle" class="card-subtitle">curl / Postman</text>
 
-  <rect x="1140" y="100" width="210" height="90" class="box" fill="#fef3c7" stroke="#d97706"/>
-  <text x="1245" y="132" text-anchor="middle" class="label">OCIR</text>
-  <text x="1245" y="158" text-anchor="middle" class="sub">Container Registry</text>
-  <text x="1245" y="180" text-anchor="middle" class="sub">5 imagens</text>
+  <rect x="285" y="330" width="280" height="500" class="zone" fill="#fff7ed" stroke="#ea580c"/>
+  <text x="315" y="370" class="zone-title">Entrada pública</text>
+  <text x="315" y="397" class="zone-subtitle">Camada gerenciada OCI</text>
+  <rect x="315" y="520" width="230" height="125" class="card" fill="#ffffff" stroke="#ea580c"/>
+  <g transform="translate(342 553)">
+    <circle cx="23" cy="36" r="17" fill="#fed7aa" stroke="#ea580c" stroke-width="3"/>
+    <circle cx="86" cy="13" r="13" fill="#fff7ed" stroke="#ea580c" stroke-width="3"/>
+    <circle cx="86" cy="36" r="13" fill="#fff7ed" stroke="#ea580c" stroke-width="3"/>
+    <circle cx="86" cy="59" r="13" fill="#fff7ed" stroke="#ea580c" stroke-width="3"/>
+    <path d="M41 36h28M37 27l36-12M37 45l36 12" class="icon-stroke" stroke="#ea580c"/>
+  </g>
+  <text x="445" y="580" class="card-title">OCI Load</text>
+  <text x="445" y="603" class="card-title">Balancer</text>
+  <text x="445" y="629" class="card-subtitle">HTTPS público</text>
 
-  <rect x="650" y="230" width="160" height="75" class="box" fill="#dcfce7" stroke="#16a34a"/>
-  <text x="730" y="262" text-anchor="middle" class="label">auth-service</text>
-  <text x="730" y="288" text-anchor="middle" class="sub">Go API keys</text>
+  <rect x="630" y="215" width="620" height="820" class="zone" fill="#eff6ff" stroke="#2563eb"/>
+  <g transform="translate(670 256)">
+    <circle cx="26" cy="26" r="22" fill="#dbeafe" stroke="#2563eb" stroke-width="3"/>
+    <circle cx="26" cy="26" r="7" fill="#ffffff" stroke="#2563eb" stroke-width="2.5"/>
+    <path d="M26 4v13M26 35v13M4 26h13M35 26h13M11 11l10 10M31 31l10 10M41 11l-10 10M21 31l-10 10" class="icon-stroke" stroke="#2563eb"/>
+  </g>
+  <text x="730" y="271" class="zone-title">OKE - Oracle Kubernetes Engine</text>
+  <text x="730" y="299" class="zone-subtitle">Namespace: togglemaster</text>
 
-  <rect x="650" y="335" width="160" height="75" class="box" fill="#dcfce7" stroke="#16a34a"/>
-  <text x="730" y="367" text-anchor="middle" class="label">flag-service</text>
-  <text x="730" y="393" text-anchor="middle" class="sub">Feature flags</text>
+  <rect x="670" y="545" width="210" height="130" class="card" fill="#eefbf4" stroke="#009639"/>
+  <use href="#icon-nginx" x="697" y="579" width="58" height="58" fill="#009639"/>
+  <text x="770" y="596" class="card-title">NGINX</text>
+  <text x="770" y="621" class="card-title">Ingress</text>
+  <text x="770" y="648" class="card-subtitle">roteamento HTTP</text>
 
-  <rect x="650" y="440" width="160" height="75" class="box" fill="#dcfce7" stroke="#16a34a"/>
-  <text x="730" y="472" text-anchor="middle" class="label">targeting</text>
-  <text x="730" y="498" text-anchor="middle" class="sub">rules service</text>
-
-  <rect x="860" y="335" width="160" height="75" class="box" fill="#dcfce7" stroke="#16a34a"/>
-  <text x="940" y="367" text-anchor="middle" class="label">evaluation</text>
-  <text x="940" y="393" text-anchor="middle" class="sub">hot path</text>
-
-  <rect x="860" y="565" width="160" height="75" class="box" fill="#dcfce7" stroke="#16a34a"/>
-  <text x="940" y="597" text-anchor="middle" class="label">analytics</text>
-  <text x="940" y="623" text-anchor="middle" class="sub">consumer</text>
-
+  <text x="910" y="335" class="zone-title">Microsserviços</text>
   <g>
-    <ellipse cx="1235" cy="245" rx="75" ry="18" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-    <rect x="1160" y="245" width="150" height="50" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-    <ellipse cx="1235" cy="295" rx="75" ry="18" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-    <text x="1235" y="270" text-anchor="middle" class="label">PostgreSQL</text>
-    <text x="1235" y="294" text-anchor="middle" class="sub">auth DB</text>
+    <rect x="910" y="365" width="265" height="92" class="card" fill="#f0fdf4" stroke="#16a34a"/>
+    <path d="M935 389l20-12 20 12v24l-20 12-20-12z" fill="#dcfce7" stroke="#16a34a" stroke-width="2.6"/>
+    <text x="990" y="405" class="card-title">auth-service</text>
+    <text x="990" y="431" class="card-subtitle">/auth - API keys</text>
   </g>
   <g>
-    <ellipse cx="1235" cy="350" rx="75" ry="18" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-    <rect x="1160" y="350" width="150" height="50" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-    <ellipse cx="1235" cy="400" rx="75" ry="18" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-    <text x="1235" y="375" text-anchor="middle" class="label">PostgreSQL</text>
-    <text x="1235" y="399" text-anchor="middle" class="sub">flags DB</text>
+    <rect x="910" y="495" width="265" height="92" class="card" fill="#f0fdf4" stroke="#16a34a"/>
+    <path d="M935 519l20-12 20 12v24l-20 12-20-12z" fill="#dcfce7" stroke="#16a34a" stroke-width="2.6"/>
+    <text x="990" y="535" class="card-title">flag-service</text>
+    <text x="990" y="561" class="card-subtitle">/flags - feature flags</text>
   </g>
   <g>
-    <ellipse cx="1235" cy="455" rx="75" ry="18" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-    <rect x="1160" y="455" width="150" height="50" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-    <ellipse cx="1235" cy="505" rx="75" ry="18" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-    <text x="1235" y="480" text-anchor="middle" class="label">PostgreSQL</text>
-    <text x="1235" y="504" text-anchor="middle" class="sub">targeting DB</text>
+    <rect x="910" y="625" width="265" height="92" class="card" fill="#f0fdf4" stroke="#16a34a"/>
+    <path d="M935 649l20-12 20 12v24l-20 12-20-12z" fill="#dcfce7" stroke="#16a34a" stroke-width="2.6"/>
+    <text x="990" y="665" class="card-title">targeting-service</text>
+    <text x="990" y="691" class="card-subtitle">/targeting - regras</text>
   </g>
   <g>
-    <ellipse cx="1235" cy="560" rx="75" ry="18" fill="#fee2e2" stroke="#b91c1c" stroke-width="2"/>
-    <rect x="1160" y="560" width="150" height="50" fill="#fee2e2" stroke="#b91c1c" stroke-width="2"/>
-    <ellipse cx="1235" cy="610" rx="75" ry="18" fill="#fee2e2" stroke="#b91c1c" stroke-width="2"/>
-    <text x="1235" y="585" text-anchor="middle" class="label">Redis</text>
-    <text x="1235" y="609" text-anchor="middle" class="sub">cache</text>
+    <rect x="910" y="755" width="265" height="92" class="card" fill="#f0fdf4" stroke="#16a34a"/>
+    <path d="M935 779l20-12 20 12v24l-20 12-20-12z" fill="#dcfce7" stroke="#16a34a" stroke-width="2.6"/>
+    <text x="990" y="795" class="card-title">evaluation-service</text>
+    <text x="990" y="821" class="card-subtitle">/evaluate - hot path</text>
   </g>
-  <rect x="1160" y="660" width="150" height="75" class="box" fill="#ede9fe" stroke="#7c3aed"/>
-  <text x="1235" y="692" text-anchor="middle" class="label">OCI Queue</text>
-  <text x="1235" y="718" text-anchor="middle" class="sub">events</text>
   <g>
-    <ellipse cx="1235" cy="790" rx="75" ry="18" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
-    <rect x="1160" y="790" width="150" height="50" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
-    <ellipse cx="1235" cy="840" rx="75" ry="18" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
-    <text x="1235" y="815" text-anchor="middle" class="label">OCI NoSQL</text>
-    <text x="1235" y="839" text-anchor="middle" class="sub">analytics</text>
+    <rect x="910" y="910" width="265" height="92" class="card" fill="#f0fdf4" stroke="#16a34a"/>
+    <path d="M935 934l20-12 20 12v24l-20 12-20-12z" fill="#dcfce7" stroke="#16a34a" stroke-width="2.6"/>
+    <text x="990" y="950" class="card-title">analytics-service</text>
+    <text x="990" y="976" class="card-subtitle">consumer de eventos</text>
   </g>
 
-  <path d="M190 320 L240 315" class="edge" stroke="#334155" marker-end="url(#arrow-slate)"/>
-  <path d="M390 315 L430 320" class="edge" stroke="#334155" marker-end="url(#arrow-slate)"/>
-  <path d="M580 300 L650 267" class="edge" stroke="#2563eb" marker-end="url(#arrow-blue)"/>
-  <text x="595" y="282" class="edge-label">/auth</text>
-  <path d="M580 326 L650 370" class="edge" stroke="#2563eb" marker-end="url(#arrow-blue)"/>
-  <text x="594" y="358" class="edge-label">/flags</text>
-  <path d="M560 360 L650 475" class="edge" stroke="#2563eb" marker-end="url(#arrow-blue)"/>
-  <text x="568" y="430" class="edge-label">/targeting</text>
-  <path d="M580 320 L860 370" class="edge" stroke="#2563eb" marker-end="url(#arrow-blue)"/>
-  <text x="760" y="345" class="edge-label">/evaluate</text>
+  <rect x="1320" y="250" width="455" height="835" class="zone" fill="#f8fafc" stroke="#64748b"/>
+  <text x="1360" y="293" class="zone-title">Dados e mensageria</text>
+  <text x="1360" y="320" class="zone-subtitle">Serviços gerenciados OCI</text>
 
-  <path d="M810 267 L1160 270" class="edge" stroke="#dc2626" marker-end="url(#arrow-red)"/>
-  <path d="M810 372 L1160 375" class="edge" stroke="#dc2626" marker-end="url(#arrow-red)"/>
-  <path d="M810 477 L1160 480" class="edge" stroke="#dc2626" marker-end="url(#arrow-red)"/>
-  <path d="M1020 372 L1160 585" class="edge" stroke="#b91c1c" marker-end="url(#arrow-red)"/>
-  <text x="1080" y="500" class="edge-label">cache</text>
-  <path d="M1020 390 L1160 695" class="edge" stroke="#7c3aed" marker-end="url(#arrow-purple)"/>
-  <text x="1086" y="640" class="edge-label">produz eventos</text>
-  <path d="M1160 695 L1020 600" class="edge" stroke="#7c3aed" marker-end="url(#arrow-purple)"/>
-  <text x="1056" y="646" class="edge-label">consome</text>
-  <path d="M1020 625 L1160 815" class="edge" stroke="#0284c7" marker-end="url(#arrow-cyan)"/>
-  <text x="1080" y="755" class="edge-label">persiste</text>
-  <path d="M860 360 L810 372" class="edge dashed" stroke="#16a34a" marker-end="url(#arrow-green)"/>
-  <path d="M860 385 L810 475" class="edge dashed" stroke="#16a34a" marker-end="url(#arrow-green)"/>
-  <path d="M1140 145 L1060 200" class="edge dashed" stroke="#d97706" marker-end="url(#arrow-amber)"/>
-  <text x="1068" y="152" class="edge-label">imagens</text>
+  <rect x="1370" y="98" width="330" height="115" class="card" fill="#fffbeb" stroke="#d97706"/>
+  <g transform="translate(1400 130)">
+    <rect x="0" y="18" width="72" height="43" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="3"/>
+    <rect x="11" y="6" width="72" height="43" rx="6" fill="#fffbeb" stroke="#d97706" stroke-width="3"/>
+    <path d="M26 23h42M26 36h29" class="icon-stroke" stroke="#d97706"/>
+  </g>
+  <text x="1510" y="145" class="card-title">OCIR</text>
+  <text x="1510" y="171" class="card-subtitle">Container Registry</text>
+  <text x="1510" y="193" class="card-subtitle">5 imagens Docker</text>
+
+  <g>
+    <rect x="1375" y="365" width="255" height="92" class="card" fill="#fef2f2" stroke="#dc2626"/>
+    <use href="#icon-postgresql" x="1395" y="382" width="58" height="58" fill="#336791"/>
+    <text x="1470" y="403" class="card-title">PostgreSQL</text>
+    <text x="1470" y="429" class="card-subtitle">auth DB</text>
+  </g>
+  <g>
+    <rect x="1375" y="495" width="255" height="92" class="card" fill="#fef2f2" stroke="#dc2626"/>
+    <use href="#icon-postgresql" x="1395" y="512" width="58" height="58" fill="#336791"/>
+    <text x="1470" y="533" class="card-title">PostgreSQL</text>
+    <text x="1470" y="559" class="card-subtitle">flags DB</text>
+  </g>
+  <g>
+    <rect x="1375" y="625" width="255" height="92" class="card" fill="#fef2f2" stroke="#dc2626"/>
+    <use href="#icon-postgresql" x="1395" y="642" width="58" height="58" fill="#336791"/>
+    <text x="1470" y="663" class="card-title">PostgreSQL</text>
+    <text x="1470" y="689" class="card-subtitle">targeting DB</text>
+  </g>
+  <g>
+    <rect x="1375" y="755" width="255" height="92" class="card" fill="#fff1f2" stroke="#b91c1c"/>
+    <rect x="1392" y="782" width="55" height="13" rx="6" fill="#fecaca" stroke="#b91c1c" stroke-width="2.5"/>
+    <rect x="1392" y="802" width="55" height="13" rx="6" fill="#fee2e2" stroke="#b91c1c" stroke-width="2.5"/>
+    <rect x="1392" y="822" width="55" height="13" rx="6" fill="#fff1f2" stroke="#b91c1c" stroke-width="2.5"/>
+    <text x="1465" y="798" class="card-title">Redis</text>
+    <text x="1465" y="824" class="card-subtitle">cache de avaliação</text>
+  </g>
+  <g>
+    <rect x="1375" y="885" width="255" height="92" class="card" fill="#f5f3ff" stroke="#7c3aed"/>
+    <rect x="1392" y="908" width="62" height="14" rx="4" fill="#ede9fe" stroke="#7c3aed" stroke-width="2.5"/>
+    <rect x="1404" y="930" width="62" height="14" rx="4" fill="#ede9fe" stroke="#7c3aed" stroke-width="2.5"/>
+    <rect x="1392" y="952" width="62" height="14" rx="4" fill="#ede9fe" stroke="#7c3aed" stroke-width="2.5"/>
+    <text x="1485" y="923" class="card-title">OCI Queue</text>
+    <text x="1485" y="949" class="card-subtitle">eventos de avaliação</text>
+  </g>
+  <g>
+    <rect x="1375" y="1015" width="255" height="92" class="card" fill="#e0f2fe" stroke="#0284c7"/>
+    <rect x="1392" y="1042" width="60" height="42" rx="4" fill="#f0f9ff" stroke="#0284c7" stroke-width="2.5"/>
+    <path d="M1392 1056h60M1392 1070h60M1411 1042v42M1432 1042v42" class="icon-stroke" stroke="#0284c7"/>
+    <text x="1485" y="1058" class="card-title">OCI NoSQL</text>
+    <text x="1485" y="1084" class="card-subtitle">analytics</text>
+  </g>
+
+  <path d="M195 588 C236 588 250 582 315 582" class="edge" stroke="#334155" marker-end="url(#arrow-slate)"/>
+  <text x="218" y="570" class="edge-label">HTTPS</text>
+  <path d="M545 582 C590 582 610 610 670 610" class="edge" stroke="#334155" marker-end="url(#arrow-slate)"/>
+
+  <path d="M880 585 C895 520 892 411 910 411" class="thin-edge" stroke="#2563eb" marker-end="url(#arrow-blue)"/>
+  <path d="M880 605 C895 570 892 541 910 541" class="thin-edge" stroke="#2563eb" marker-end="url(#arrow-blue)"/>
+  <path d="M880 625 C895 660 892 671 910 671" class="thin-edge" stroke="#2563eb" marker-end="url(#arrow-blue)"/>
+  <path d="M880 645 C895 720 892 801 910 801" class="thin-edge" stroke="#2563eb" marker-end="url(#arrow-blue)"/>
+
+  <path d="M1175 411 C1242 411 1295 411 1375 411" class="thin-edge" stroke="#dc2626" marker-end="url(#arrow-red)"/>
+  <path d="M1175 541 C1242 541 1295 541 1375 541" class="thin-edge" stroke="#dc2626" marker-end="url(#arrow-red)"/>
+  <path d="M1175 671 C1242 671 1295 671 1375 671" class="thin-edge" stroke="#dc2626" marker-end="url(#arrow-red)"/>
+  <path d="M1175 801 C1242 801 1295 801 1375 801" class="thin-edge" stroke="#b91c1c" marker-end="url(#arrow-red)"/>
+
+  <path d="M1175 820 C1238 850 1290 925 1375 925" class="thin-edge dashed" stroke="#7c3aed" marker-end="url(#arrow-purple)"/>
+  <path d="M1375 940 C1288 940 1240 956 1175 956" class="thin-edge dashed" stroke="#7c3aed" marker-end="url(#arrow-purple)"/>
+  <path d="M1175 974 C1244 1002 1292 1061 1375 1061" class="thin-edge" stroke="#0284c7" marker-end="url(#arrow-cyan)"/>
+
+  <path d="M1190 780 C1236 745 1238 674 1175 671" class="thin-edge dashed" stroke="#16a34a" marker-end="url(#arrow-green)"/>
+  <text x="1216" y="718" class="edge-label">consulta regras</text>
+  <path d="M1200 766 C1270 698 1260 544 1175 541" class="thin-edge dashed" stroke="#16a34a" marker-end="url(#arrow-green)"/>
+  <text x="1258" y="638" class="edge-label">consulta flags</text>
+
+  <path d="M1370 152 C1305 152 1270 190 1245 235" class="thin-edge dashed" stroke="#d97706" marker-end="url(#arrow-orange)"/>
+  <text x="1258" y="183" class="edge-label">pull images</text>
+
+  <g transform="translate(300 1160)">
+    <text x="0" y="0" class="legend-text">Legenda:</text>
+    <path d="M80 -5h46" class="thin-edge" stroke="#2563eb" marker-end="url(#arrow-blue)"/>
+    <text x="140" y="0" class="legend-text">rota HTTP</text>
+    <path d="M260 -5h46" class="thin-edge" stroke="#dc2626" marker-end="url(#arrow-red)"/>
+    <text x="320" y="0" class="legend-text">read/write</text>
+    <path d="M445 -5h46" class="thin-edge dashed" stroke="#16a34a" marker-end="url(#arrow-green)"/>
+    <text x="505" y="0" class="legend-text">dependência interna</text>
+    <path d="M705 -5h46" class="thin-edge dashed" stroke="#7c3aed" marker-end="url(#arrow-purple)"/>
+    <text x="765" y="0" class="legend-text">evento assíncrono</text>
+    <path d="M980 -5h46" class="thin-edge dashed" stroke="#d97706" marker-end="url(#arrow-orange)"/>
+    <text x="1040" y="0" class="legend-text">imagem de container</text>
+  </g>
 </svg>

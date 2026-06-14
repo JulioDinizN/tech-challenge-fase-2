@@ -27,7 +27,7 @@ Saída gerada: `dist/delivery-report.pdf`.
 ## Arquitetura
 
 - Diagrama geral: `docs/diagrams/overall-architecture.png`
-- Status: PENDENTE exportar o diagrama do draw.io.
+- Status: diagrama exportado a partir de `docs/diagrams/overall-architecture.drawio`.
 
 ## Pontuação extra opcional
 

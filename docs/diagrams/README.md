@@ -11,3 +11,5 @@ Expected files:
 - `request-flow.png`, if needed
 
 The PDF generator reads local image exports from this folder through `docs/report.html`.
+
+`overall-architecture.svg` embeds local SVG symbol paths for PostgreSQL and NGINX brand icons so the PDF can be regenerated without remote assets.
