@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -267,6 +267,54 @@
         padding-left: 3mm;
       }
 
+      .deliverable-grid {
+        display: grid;
+        gap: 3mm;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        margin: 3mm 0 6mm;
+      }
+
+      .deliverable-card {
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        break-inside: avoid;
+        padding: 3mm;
+      }
+
+      .deliverable-card strong {
+        color: var(--oci-deep);
+        display: block;
+        margin-bottom: 1mm;
+      }
+
+      .state {
+        border-radius: 999px;
+        display: inline-block;
+        font-size: 8pt;
+        font-weight: 800;
+        margin-bottom: 1.5mm;
+        padding: 0.7mm 2mm;
+        text-transform: uppercase;
+      }
+
+      .state.done {
+        background: #e4efe5;
+        color: var(--green);
+      }
+
+      .state.pending {
+        background: #fff2dd;
+        color: var(--amber);
+      }
+
+      .traceability-table td:first-child {
+        width: 20%;
+      }
+
+      .traceability-table td:nth-child(3) {
+        width: 18%;
+      }
+
       @media screen {
         body {
           background: #e8ecef;
@@ -303,14 +351,16 @@
 
         <div class="meta-grid">
           <div class="meta-box">
-            <span class="meta-label">Participants</span>
-            <p><span class="placeholder">TODO:</span> Participant name, RM, Discord</p>
-            <p><span class="placeholder">TODO:</span> Add every group member</p>
+            <span class="meta-label">Identificação</span>
+            <p><strong>Grupo:</strong> 191</p>
+            <p><strong>Participante:</strong> Julio Cesar Diniz Nogueira</p>
+            <p><strong>Matrícula:</strong> RM373719</p>
+            <p><strong>E-mail:</strong> juliocesardiniznogueira@gmail.com</p>
+            <p><strong>Discord:</strong> <span class="placeholder">TODO</span></p>
           </div>
           <div class="meta-box">
             <span class="meta-label">Repository</span>
             <p>
-              <span class="placeholder">TODO:</span>
               <a href="https://github.com/JulioDinizN/tech-challenge-fase-2">https://github.com/JulioDinizN/tech-challenge-fase-2</a>
             </p>
           </div>
@@ -337,9 +387,9 @@
       </section>
 
       <section class="section">
-        <h2>Review Checklist</h2>
+        <h2>Submission Checklist</h2>
         <ol class="toc">
-          <li>Participants, RM, Discord</li>
+          <li>Group, participant, RM, e-mail, Discord</li>
           <li>Repository and video links</li>
           <li>Oracle Cloud provider explanation</li>
           <li>Architecture diagram and summary</li>
@@ -355,9 +405,28 @@
 
         <div class="page-note">
           <p>
-            This HTML file is the source of truth for the PDF submitted to review.
-            Keep placeholders visible until the final evidence, links, and diagrams are ready.
+            This HTML file is the source of truth for the PDF submitted to review. The PDF must be generated
+            with <code>npm run report:pdf</code> after all evidence, video links, and draw.io exports are finalized.
           </p>
+        </div>
+
+        <h3>Required Submission Package</h3>
+        <div class="deliverable-grid">
+          <div class="deliverable-card">
+            <span class="state pending">Final</span>
+            <strong>Delivery report</strong>
+            <p class="small">Submit <code>dist/delivery-report.pdf</code>, generated from <code>docs/report.html</code>.</p>
+          </div>
+          <div class="deliverable-card">
+            <span class="state pending">Final</span>
+            <strong>Demo video</strong>
+            <p class="small">Add the public video link and keep the walkthrough at or below 20 minutes.</p>
+          </div>
+          <div class="deliverable-card">
+            <span class="state done">Ready</span>
+            <strong>Repository</strong>
+            <p class="small">Include source code, Dockerfiles, Compose, Kubernetes manifests, scripts, and docs.</p>
+          </div>
         </div>
 
         <h3>Current Delivery State</h3>
@@ -367,6 +436,63 @@
           <li>Oracle Cloud naming is used for the delivery structure and final documentation.</li>
           <li>Kubernetes, OCI provisioning, scaling evidence, and final video evidence still need completion.</li>
         </ul>
+      </section>
+
+      <section class="section">
+        <h2>Requirement Traceability</h2>
+        <p>
+          The report is organized to prove each challenge requirement with the expected implementation artifact
+          and evidence. Items marked as pending must be completed before the final submission PDF is generated.
+        </p>
+
+        <table class="traceability-table">
+          <thead>
+            <tr>
+              <th>Requirement</th>
+              <th>What must be demonstrated</th>
+              <th>Status</th>
+              <th>Evidence location</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1. Analysis and containerization</td>
+              <td>Dockerfile for each microservice, root Docker Compose, local health checks, and local end-to-end evaluation flow.</td>
+              <td><span class="state done">Implemented</span></td>
+              <td><code>docker-compose.yml</code>, service Dockerfiles, <code>docs/local-development.md</code>, final screenshots/logs.</td>
+            </tr>
+            <tr>
+              <td>2. OCI infrastructure</td>
+              <td>OKE, OCIR, PostgreSQL resources, Redis, OCI Queue, and OCI NoSQL resources configured for the services.</td>
+              <td><span class="state pending">Pending</span></td>
+              <td><span class="placeholder">TODO:</span> OCI CLI output, console screenshots, and provisioning notes.</td>
+            </tr>
+            <tr>
+              <td>3. Cluster configuration</td>
+              <td>Metrics Server, Nginx Ingress Controller, external OCI load balancer, node/pod metrics, and image pull from OCIR.</td>
+              <td><span class="state pending">Pending</span></td>
+              <td><span class="placeholder">TODO:</span> <code>kubectl top</code>, ingress, and load balancer evidence.</td>
+            </tr>
+            <tr>
+              <td>4. Kubernetes manifests</td>
+              <td>Namespace, deployments, ClusterIP services, secrets/config maps, probes, resources, ingress, and service routing.</td>
+              <td><span class="state pending">Pending</span></td>
+              <td><span class="placeholder">TODO:</span> Manifests under <code>k8s/</code> and deployment verification output.</td>
+            </tr>
+            <tr>
+              <td>5. Scalability</td>
+              <td>HPA or justified scaling strategy for evaluation and analytics, load generation, replica growth, and analytics persistence.</td>
+              <td><span class="state pending">Pending</span></td>
+              <td><span class="placeholder">TODO:</span> HPA output, pod counts, queue/log evidence, and NoSQL records.</td>
+            </tr>
+            <tr>
+              <td>Video</td>
+              <td>Recorded walkthrough showing local Compose, OKE deployment, ingress, scaling, and analytics persistence.</td>
+              <td><span class="state pending">Pending</span></td>
+              <td><span class="placeholder">TODO:</span> Final video link.</td>
+            </tr>
+          </tbody>
+        </table>
       </section>
 
       <section class="section">
@@ -489,6 +615,11 @@
           Redis, and DynamoDB Local for local analytics compatibility.
         </p>
 
+        <p>
+          This satisfies the first challenge requirement by showing that each service can be built, configured,
+          started, and exercised outside the cloud environment before the Kubernetes deployment is attempted.
+        </p>
+
         <div class="two-column">
           <div>
             <h3>Commands</h3>
@@ -516,6 +647,16 @@
           config maps, secrets, Nginx Ingress, HPA resources, and OCIR image references. Secrets must be
           represented safely and no raw credentials should appear in this report or repository.
         </p>
+
+        <h3>Expected Kubernetes artifacts</h3>
+        <ul>
+          <li>Namespace for the challenge deployment.</li>
+          <li>Five deployments with OCIR images, resource requests/limits, and readiness or liveness probes.</li>
+          <li>Five ClusterIP services for internal service discovery.</li>
+          <li>Secret generation workflow for database URLs, API keys, queue credentials, and NoSQL configuration.</li>
+          <li>ConfigMap for non-secret runtime settings and internal service URLs.</li>
+          <li>Nginx Ingress route definitions for public traffic entering through the OCI load balancer.</li>
+        </ul>
 
         <table class="evidence-table">
           <thead>
@@ -547,6 +688,10 @@
 
       <section class="section">
         <h2>Scalability</h2>
+        <p>
+          The scalability section must prove horizontal scaling, not only define manifests. The final evidence
+          should show a baseline pod count, load generation, HPA metric movement, and increased replicas.
+        </p>
         <div class="two-column">
           <div>
             <h3>Evaluation service</h3>
@@ -620,6 +765,10 @@
 
       <section class="section">
         <h2>Evidence Index</h2>
+        <p>
+          Keep screenshots, terminal captures, and command outputs under <code>evidence/</code> when possible.
+          The final report can reference evidence paths or summarize the key output inline.
+        </p>
         <table class="evidence-table">
           <thead>
             <tr>

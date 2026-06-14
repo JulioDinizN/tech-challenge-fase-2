@@ -15,15 +15,17 @@ Generated output: `dist/delivery-report.pdf`.
 The generated PDF is ignored by Git because `dist/` is a build output folder.
 Keep this Markdown file as a working draft and use `docs/report.html` for the submitted report layout.
 
-## Participants
+## Identificação
 
-- Name:
-- RM:
-- Discord:
+- Grupo: 191
+- Participante: Julio Cesar Diniz Nogueira
+- E-mail: juliocesardiniznogueira@gmail.com
+- Matrícula: RM373719
+- Discord: TODO
 
 ## Repository
 
-- Link:
+- Link: https://github.com/JulioDinizN/tech-challenge-fase-2
 
 ## Video
 
@@ -32,6 +34,17 @@ Keep this Markdown file as a working draft and use `docs/report.html` for the su
 ## Architecture
 
 TODO
+
+## Requirement traceability
+
+The final PDF generated from `docs/report.html` must prove these challenge areas:
+
+- Analysis and containerization: Dockerfile for each service, Docker Compose, local health checks, and local end-to-end flow.
+- OCI infrastructure: OKE, OCIR, PostgreSQL resources, Redis, OCI Queue, and OCI NoSQL.
+- Cluster configuration: Metrics Server, Nginx Ingress Controller, external load balancer, metrics validation, and image pull from OCIR.
+- Kubernetes manifests: namespace, deployments, services, secrets/config maps, probes, resources, ingress, and route validation.
+- Scalability: HPA or justified scaling strategy for evaluation and analytics, load generation, replica changes, and persistence evidence.
+- Video: walkthrough up to 20 minutes showing local Compose, OKE deployment, ingress, scaling, and analytics persistence.
 
 ## Implementation notes
 
