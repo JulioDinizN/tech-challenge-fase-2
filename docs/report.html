@@ -3,337 +3,148 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>POSTECH Tech Challenge Fase 2 - ToggleMaster Delivery Report</title>
+    <title>Relatório de Entrega - Tech Challenge Fase 2 - Grupo 191</title>
     <style>
-      :root {
-        --ink: #172026;
-        --muted: #53616b;
-        --line: #d7dde2;
-        --paper: #ffffff;
-        --soft: #f4f7f8;
-        --oci-red: #c74634;
-        --oci-deep: #312d2a;
-        --blue: #245b75;
-        --green: #4d7f4f;
-        --amber: #a46210;
-      }
-
       @page {
         size: A4;
-        margin: 14mm 14mm 16mm;
+        margin: 14mm;
       }
 
       * {
         box-sizing: border-box;
       }
 
-      html {
-        color: var(--ink);
-        background: var(--paper);
-        font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
-        font-size: 11.2pt;
-        line-height: 1.48;
-      }
-
       body {
         margin: 0;
+        color: #111827;
+        background: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+        font-size: 11pt;
+        line-height: 1.45;
+      }
+
+      main {
+        max-width: 182mm;
+        margin: 0 auto;
       }
 
       h1,
       h2,
-      h3 {
-        color: var(--oci-deep);
-        font-family: "Iowan Old Style", Georgia, serif;
-        font-weight: 700;
-        letter-spacing: 0;
-        line-height: 1.12;
-        margin: 0;
+      p {
+        margin-top: 0;
       }
 
       h1 {
-        font-size: 31pt;
-        max-width: 13cm;
+        margin-bottom: 3mm;
+        color: #0f172a;
+        font-size: 24pt;
+        line-height: 1.1;
       }
 
       h2 {
-        border-bottom: 2px solid var(--line);
-        font-size: 18pt;
-        margin: 0 0 5mm;
-        padding-bottom: 2.5mm;
-      }
-
-      h3 {
-        font-size: 13pt;
-        margin: 6mm 0 2mm;
+        margin: 8mm 0 3mm;
+        padding-bottom: 1.5mm;
+        border-bottom: 1px solid #cbd5e1;
+        color: #0f172a;
+        font-size: 15pt;
       }
 
       p {
-        margin: 0 0 3.4mm;
+        margin-bottom: 2.5mm;
       }
 
       a {
-        color: var(--blue);
+        color: #1d4ed8;
+        overflow-wrap: anywhere;
         text-decoration: none;
       }
 
       table {
-        border-collapse: collapse;
-        margin: 3mm 0 6mm;
         width: 100%;
+        border-collapse: collapse;
+        margin-top: 2mm;
       }
 
       th,
       td {
-        border: 1px solid var(--line);
-        padding: 2.2mm 2.6mm;
+        padding: 2.4mm 2.8mm;
+        border: 1px solid #d7dee8;
         text-align: left;
         vertical-align: top;
       }
 
       th {
-        background: #eef2f3;
-        color: var(--oci-deep);
-        font-size: 9pt;
-        text-transform: uppercase;
-      }
-
-      ul {
-        margin: 0 0 5mm 5mm;
-        padding: 0;
-      }
-
-      li {
-        margin: 1.3mm 0;
-      }
-
-      code {
-        background: #eef2f3;
-        border-radius: 3px;
-        font-family: "SFMono-Regular", Consolas, monospace;
-        font-size: 9.2pt;
-        padding: 0.3mm 1mm;
+        width: 34%;
+        background: #f1f5f9;
+        color: #334155;
+        font-weight: 700;
       }
 
       .cover {
-        min-height: 258mm;
-        position: relative;
-      }
-
-      .cover-rule {
-        background: linear-gradient(90deg, var(--oci-red), var(--oci-deep));
-        height: 5mm;
-        margin-bottom: 18mm;
-        width: 100%;
+        margin-bottom: 7mm;
+        padding: 6mm;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        background: #f8fafc;
       }
 
       .eyebrow {
-        color: var(--oci-red);
+        margin-bottom: 2mm;
+        color: #64748b;
         font-size: 9pt;
-        font-weight: 800;
-        margin-bottom: 4mm;
+        font-weight: 700;
         text-transform: uppercase;
       }
 
       .subtitle {
-        color: var(--muted);
-        font-size: 13.5pt;
-        margin-top: 5mm;
-        max-width: 15cm;
+        margin-bottom: 0;
+        color: #475569;
       }
 
-      .meta-grid {
-        display: grid;
-        gap: 4mm;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        margin-top: 17mm;
-      }
-
-      .meta-box,
-      .callout,
-      .diagram-placeholder {
-        background: var(--soft);
-        border: 1px solid var(--line);
-        border-radius: 4px;
-        padding: 4mm;
-      }
-
-      .meta-label {
-        color: var(--muted);
-        display: block;
-        font-size: 8.6pt;
-        font-weight: 800;
-        margin-bottom: 1.2mm;
-        text-transform: uppercase;
-      }
-
-      .placeholder {
-        color: var(--amber);
+      .pending {
+        color: #92400e;
         font-weight: 700;
       }
 
-      .cover-footer {
-        bottom: 0;
-        color: var(--muted);
-        display: grid;
-        gap: 3mm;
-        grid-template-columns: 1fr 1fr;
-        position: absolute;
-        width: 100%;
-      }
-
-      .section {
-        break-before: page;
-      }
-
-      .section:first-of-type {
-        break-before: auto;
-      }
-
-      .two-column {
-        display: grid;
-        gap: 6mm;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .status-list {
-        list-style: none;
-        margin-left: 0;
-      }
-
-      .status-list li {
-        border-left: 3px solid var(--green);
-        padding-left: 2.6mm;
-      }
-
-      .muted {
-        color: var(--muted);
-      }
-
-      .small {
-        font-size: 9.5pt;
-      }
-
       .diagram {
-        break-inside: avoid;
-        margin: 4mm 0 6mm;
+        margin: 2mm 0 0;
+        page-break-inside: avoid;
       }
 
       .diagram img {
-        border: 1px solid var(--line);
         display: block;
-        max-height: 130mm;
-        max-width: 100%;
-        object-fit: contain;
         width: 100%;
+        max-height: 105mm;
+        border: 1px solid #d7dee8;
+        object-fit: contain;
       }
 
       .diagram-placeholder {
-        color: var(--muted);
-        min-height: 46mm;
+        padding: 4mm;
+        border: 1px dashed #94a3b8;
+        background: #f8fafc;
+        color: #475569;
       }
 
-      .diagram-placeholder strong {
-        color: var(--oci-deep);
-        display: block;
-        margin-bottom: 2mm;
-      }
-
-      .evidence-table td:first-child {
-        width: 35%;
-      }
-
-      .toc {
-        columns: 2;
-        column-gap: 10mm;
-        list-style: decimal;
-        margin-left: 6mm;
-      }
-
-      .badge {
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        color: var(--oci-deep);
-        display: inline-block;
-        font-size: 8.5pt;
-        font-weight: 800;
-        margin: 0 1.2mm 1.2mm 0;
-        padding: 1mm 2.5mm;
-        text-transform: uppercase;
-      }
-
-      .page-note {
-        border-left: 4px solid var(--oci-red);
-        margin: 4mm 0 6mm;
-        padding-left: 3mm;
-      }
-
-      .deliverable-grid {
-        display: grid;
-        gap: 3mm;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        margin: 3mm 0 6mm;
-      }
-
-      .deliverable-card {
-        border: 1px solid var(--line);
-        border-radius: 4px;
-        break-inside: avoid;
-        padding: 3mm;
-      }
-
-      .deliverable-card strong {
-        color: var(--oci-deep);
-        display: block;
-        margin-bottom: 1mm;
-      }
-
-      .state {
-        border-radius: 999px;
-        display: inline-block;
-        font-size: 8pt;
-        font-weight: 800;
-        margin-bottom: 1.5mm;
-        padding: 0.7mm 2mm;
-        text-transform: uppercase;
-      }
-
-      .state.done {
-        background: #e4efe5;
-        color: var(--green);
-      }
-
-      .state.pending {
-        background: #fff2dd;
-        color: var(--amber);
-      }
-
-      .traceability-table td:first-child {
-        width: 20%;
-      }
-
-      .traceability-table td:nth-child(3) {
-        width: 18%;
+      .note {
+        margin-top: 8mm;
+        padding: 3mm 4mm;
+        border-left: 4px solid #cbd5e1;
+        background: #f8fafc;
+        color: #475569;
       }
 
       @media screen {
         body {
-          background: #e8ecef;
+          background: #e5e7eb;
           padding: 16px;
         }
 
         main {
-          background: var(--paper);
-          box-shadow: 0 12px 45px rgba(23, 32, 38, 0.16);
-          margin: 0 auto;
-          max-width: 210mm;
           min-height: 297mm;
           padding: 14mm;
-        }
-      }
-
-      @media print {
-        .screen-only {
-          display: none;
+          background: #ffffff;
+          box-shadow: 0 12px 34px rgba(15, 23, 42, 0.12);
         }
       }
     </style>
@@ -341,487 +152,86 @@
   <body>
     <main>
       <section class="cover">
-        <div class="cover-rule"></div>
         <p class="eyebrow">POSTECH Tech Challenge - Fase 2</p>
-        <h1>ToggleMaster Delivery Report</h1>
-        <p class="subtitle">
-          Microservices delivery package for local container execution, Oracle Cloud
-          Infrastructure deployment, Kubernetes ingress, and scalability evidence.
-        </p>
-
-        <div class="meta-grid">
-          <div class="meta-box">
-            <span class="meta-label">Identificação</span>
-            <p><strong>Grupo:</strong> 191</p>
-            <p><strong>Participante:</strong> Julio Cesar Diniz Nogueira</p>
-            <p><strong>Matrícula:</strong> RM373719</p>
-            <p><strong>E-mail:</strong> juliocesardiniznogueira@gmail.com</p>
-            <p><strong>Discord:</strong> Júlio César - RM373719</p>
-          </div>
-          <div class="meta-box">
-            <span class="meta-label">Repository</span>
-            <p>
-              <a href="https://github.com/JulioDinizN/tech-challenge-fase-2">https://github.com/JulioDinizN/tech-challenge-fase-2</a>
-            </p>
-          </div>
-          <div class="meta-box">
-            <span class="meta-label">Demo video</span>
-            <p><span class="placeholder">TODO:</span> Add final video link</p>
-          </div>
-          <div class="meta-box">
-            <span class="meta-label">Cloud provider</span>
-            <p>Oracle Cloud Infrastructure, using the challenge personal-cloud option.</p>
-          </div>
-        </div>
-
-        <div class="cover-footer">
-          <div>
-            <span class="meta-label">Primary submission file</span>
-            <p><code>dist/delivery-report.pdf</code></p>
-          </div>
-          <div>
-            <span class="meta-label">Generated from</span>
-            <p><code>docs/report.html</code></p>
-          </div>
-        </div>
+        <h1>Relatório de Entrega</h1>
+        <p class="subtitle">Grupo 191 - Projeto ToggleMaster</p>
       </section>
 
-      <section class="section">
-        <h2>Submission Checklist</h2>
-        <ol class="toc">
-          <li>Group, participant, RM, e-mail, Discord</li>
-          <li>Repository and video links</li>
-          <li>Oracle Cloud provider explanation</li>
-          <li>Architecture diagram and summary</li>
-          <li>Local Docker execution evidence</li>
-          <li>Kubernetes deployment on OKE</li>
-          <li>Nginx Ingress and public route evidence</li>
-          <li>Evaluation service scalability</li>
-          <li>Analytics service scalability</li>
-          <li>Data-store responsibilities</li>
-          <li>Implementation challenges and fixes</li>
-          <li>Evidence links and final conclusions</li>
-        </ol>
-
-        <div class="page-note">
-          <p>
-            This HTML file is the source of truth for the PDF submitted to review. The PDF must be generated
-            with <code>npm run report:pdf</code> after all evidence, video links, and draw.io exports are finalized.
-          </p>
-        </div>
-
-        <h3>Required Submission Package</h3>
-        <div class="deliverable-grid">
-          <div class="deliverable-card">
-            <span class="state pending">Final</span>
-            <strong>Delivery report</strong>
-            <p class="small">Submit <code>dist/delivery-report.pdf</code>, generated from <code>docs/report.html</code>.</p>
-          </div>
-          <div class="deliverable-card">
-            <span class="state pending">Final</span>
-            <strong>Demo video</strong>
-            <p class="small">Add the public video link and keep the walkthrough at or below 20 minutes.</p>
-          </div>
-          <div class="deliverable-card">
-            <span class="state done">Ready</span>
-            <strong>Repository</strong>
-            <p class="small">Include source code, Dockerfiles, Compose, Kubernetes manifests, scripts, and docs.</p>
-          </div>
-        </div>
-
-        <h3>Current Delivery State</h3>
-        <ul class="status-list">
-          <li>All five imported microservices have Dockerfiles.</li>
-          <li>The local Docker Compose stack runs five app containers plus four dependency containers.</li>
-          <li>Oracle Cloud naming is used for the delivery structure and final documentation.</li>
-          <li>Kubernetes, OCI provisioning, scaling evidence, and final video evidence still need completion.</li>
-        </ul>
-      </section>
-
-      <section class="section">
-        <h2>Requirement Traceability</h2>
-        <p>
-          The report is organized to prove each challenge requirement with the expected implementation artifact
-          and evidence. Items marked as pending must be completed before the final submission PDF is generated.
-        </p>
-
-        <table class="traceability-table">
-          <thead>
-            <tr>
-              <th>Requirement</th>
-              <th>What must be demonstrated</th>
-              <th>Status</th>
-              <th>Evidence location</th>
-            </tr>
-          </thead>
+      <section>
+        <h2>Identificação</h2>
+        <table>
           <tbody>
             <tr>
-              <td>1. Analysis and containerization</td>
-              <td>Dockerfile for each microservice, root Docker Compose, local health checks, and local end-to-end evaluation flow.</td>
-              <td><span class="state done">Implemented</span></td>
-              <td><code>docker-compose.yml</code>, service Dockerfiles, <code>docs/local-development.md</code>, final screenshots/logs.</td>
+              <th>Grupo</th>
+              <td>191</td>
             </tr>
             <tr>
-              <td>2. OCI infrastructure</td>
-              <td>OKE, OCIR, PostgreSQL resources, Redis, OCI Queue, and OCI NoSQL resources configured for the services.</td>
-              <td><span class="state pending">Pending</span></td>
-              <td><span class="placeholder">TODO:</span> OCI CLI output, console screenshots, and provisioning notes.</td>
+              <th>Participante</th>
+              <td>Julio Cesar Diniz Nogueira</td>
             </tr>
             <tr>
-              <td>3. Cluster configuration</td>
-              <td>Metrics Server, Nginx Ingress Controller, external OCI load balancer, node/pod metrics, and image pull from OCIR.</td>
-              <td><span class="state pending">Pending</span></td>
-              <td><span class="placeholder">TODO:</span> <code>kubectl top</code>, ingress, and load balancer evidence.</td>
+              <th>Matrícula</th>
+              <td>RM373719</td>
             </tr>
             <tr>
-              <td>4. Kubernetes manifests</td>
-              <td>Namespace, deployments, ClusterIP services, secrets/config maps, probes, resources, ingress, and service routing.</td>
-              <td><span class="state pending">Pending</span></td>
-              <td><span class="placeholder">TODO:</span> Manifests under <code>k8s/</code> and deployment verification output.</td>
-            </tr>
-            <tr>
-              <td>5. Scalability</td>
-              <td>HPA or justified scaling strategy for evaluation and analytics, load generation, replica growth, and analytics persistence.</td>
-              <td><span class="state pending">Pending</span></td>
-              <td><span class="placeholder">TODO:</span> HPA output, pod counts, queue/log evidence, and NoSQL records.</td>
-            </tr>
-            <tr>
-              <td>Video</td>
-              <td>Recorded walkthrough showing local Compose, OKE deployment, ingress, scaling, and analytics persistence.</td>
-              <td><span class="state pending">Pending</span></td>
-              <td><span class="placeholder">TODO:</span> Final video link.</td>
+              <th>Discord</th>
+              <td>Júlio César - RM373719</td>
             </tr>
           </tbody>
         </table>
       </section>
 
-      <section class="section">
-        <h2>Oracle Cloud Architecture</h2>
-        <p>
-          The original challenge examples map to Oracle Cloud Infrastructure services.
-          The final deployment targets OKE for Kubernetes workloads, OCIR for images,
-          PostgreSQL resources for relational service data, Redis for evaluation cache,
-          OCI Queue for asynchronous analytics events, and OCI NoSQL Database for analytics persistence.
-        </p>
+      <section>
+        <h2>Links da Entrega</h2>
+        <table>
+          <tbody>
+            <tr>
+              <th>Repositório</th>
+              <td>
+                <a href="https://github.com/JulioDinizN/tech-challenge-fase-2">https://github.com/JulioDinizN/tech-challenge-fase-2</a>
+              </td>
+            </tr>
+            <tr>
+              <th>Vídeo de demonstração</th>
+              <td><span class="pending">PENDENTE:</span> adicionar o link do vídeo salvo no YouTube ou em outro local de preferência.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
 
+      <section>
+        <h2>Arquitetura</h2>
+        <p>Diagrama geral da solução com microsserviços, Kubernetes, Ingress e serviços de dados.</p>
         <figure class="diagram">
           <img
             src="diagrams/overall-architecture.png"
-            alt="Overall Oracle Cloud architecture diagram"
-            data-fallback="overall-architecture-placeholder"
+            alt="Diagrama geral da arquitetura do ToggleMaster"
+            data-fallback="architecture-placeholder"
           />
-          <div class="diagram-placeholder" id="overall-architecture-placeholder">
-            <strong>TODO: Export draw.io diagram to <code>docs/diagrams/overall-architecture.png</code></strong>
-            Show client traffic entering the OKE load balancer and Nginx Ingress, then reaching
-            auth-service, flag-service, targeting-service, evaluation-service, and analytics-service.
-            Include OCIR, PostgreSQL resources, Redis, OCI Queue, and OCI NoSQL Database.
+          <div class="diagram-placeholder" id="architecture-placeholder">
+            <strong>PENDENTE:</strong> exportar o diagrama do draw.io para
+            <code>docs/diagrams/overall-architecture.png</code>.
           </div>
         </figure>
+      </section>
 
+      <section>
+        <h2>Pontuação Extra Opcional</h2>
         <table>
-          <thead>
-            <tr>
-              <th>Challenge category</th>
-              <th>Oracle Cloud target</th>
-              <th>Purpose</th>
-            </tr>
-          </thead>
           <tbody>
             <tr>
-              <td>Kubernetes cluster</td>
-              <td>OKE</td>
-              <td>Runs the five microservice deployments, services, ingress, and autoscaling resources.</td>
-            </tr>
-            <tr>
-              <td>Container registry</td>
-              <td>OCIR</td>
-              <td>Stores versioned images built from the repository Dockerfiles.</td>
-            </tr>
-            <tr>
-              <td>Relational database</td>
-              <td>PostgreSQL resources</td>
-              <td>Stores auth API keys, feature flags, and targeting rules in separate service databases.</td>
-            </tr>
-            <tr>
-              <td>Cache</td>
-              <td>OCI Cache with Redis or approved Redis deployment</td>
-              <td>Supports low-latency evaluation reads and repeated targeting decisions.</td>
-            </tr>
-            <tr>
-              <td>Queue</td>
-              <td>OCI Queue</td>
-              <td>Decouples evaluation event production from analytics processing.</td>
-            </tr>
-            <tr>
-              <td>NoSQL database</td>
-              <td>OCI NoSQL Database</td>
-              <td>Persists analytics events consumed from the queue.</td>
+              <th>Google Cloud Skills Boost</th>
+              <td>Não realizado no momento. Caso a trilha seja concluída, adicionar aqui o link público do perfil ou badge.</td>
             </tr>
           </tbody>
         </table>
       </section>
 
-      <section class="section">
-        <h2>Service Responsibilities</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Service</th>
-              <th>Runtime</th>
-              <th>Responsibility</th>
-              <th>Data dependency</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>auth-service</code></td>
-              <td>Go</td>
-              <td>Issues and validates API keys used by protected services.</td>
-              <td>PostgreSQL</td>
-            </tr>
-            <tr>
-              <td><code>flag-service</code></td>
-              <td>Python</td>
-              <td>Creates, lists, and retrieves feature flags.</td>
-              <td>PostgreSQL and auth-service</td>
-            </tr>
-            <tr>
-              <td><code>targeting-service</code></td>
-              <td>Python</td>
-              <td>Creates and evaluates targeting rules.</td>
-              <td>PostgreSQL and auth-service</td>
-            </tr>
-            <tr>
-              <td><code>evaluation-service</code></td>
-              <td>Go</td>
-              <td>Combines flag state, targeting decisions, Redis cache, and event production.</td>
-              <td>Redis, flag-service, targeting-service, OCI Queue</td>
-            </tr>
-            <tr>
-              <td><code>analytics-service</code></td>
-              <td>Python</td>
-              <td>Consumes evaluation events and persists analytics data.</td>
-              <td>OCI Queue and OCI NoSQL Database</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section class="section">
-        <h2>Local Execution</h2>
-        <p>
-          Local execution uses Docker Compose to prove the ecosystem can run before cloud deployment.
-          The stack starts five app containers and four dependency containers: two PostgreSQL instances,
-          Redis, and DynamoDB Local for local analytics compatibility.
-        </p>
-
-        <p>
-          This satisfies the first challenge requirement by showing that each service can be built, configured,
-          started, and exercised outside the cloud environment before the Kubernetes deployment is attempted.
-        </p>
-
-        <div class="two-column">
-          <div>
-            <h3>Commands</h3>
-            <ul>
-              <li><code>docker compose build</code></li>
-              <li><code>docker compose up -d</code></li>
-              <li><code>docker compose ps</code></li>
-            </ul>
-          </div>
-          <div>
-            <h3>Evidence to attach</h3>
-            <ul>
-              <li><span class="placeholder">TODO:</span> Compose output</li>
-              <li><span class="placeholder">TODO:</span> Container list showing 9 containers</li>
-              <li><span class="placeholder">TODO:</span> Health checks and smoke-test output</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <h2>Cloud Deployment</h2>
-        <p>
-          The cloud deployment section must summarize the OKE namespace, deployments, ClusterIP services,
-          config maps, secrets, Nginx Ingress, HPA resources, and OCIR image references. Secrets must be
-          represented safely and no raw credentials should appear in this report or repository.
-        </p>
-
-        <h3>Expected Kubernetes artifacts</h3>
-        <ul>
-          <li>Namespace for the challenge deployment.</li>
-          <li>Five deployments with OCIR images, resource requests/limits, and readiness or liveness probes.</li>
-          <li>Five ClusterIP services for internal service discovery.</li>
-          <li>Secret generation workflow for database URLs, API keys, queue credentials, and NoSQL configuration.</li>
-          <li>ConfigMap for non-secret runtime settings and internal service URLs.</li>
-          <li>Nginx Ingress route definitions for public traffic entering through the OCI load balancer.</li>
-        </ul>
-
-        <table class="evidence-table">
-          <thead>
-            <tr>
-              <th>Requirement</th>
-              <th>Evidence</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>OKE cluster</td>
-              <td><span class="placeholder">TODO:</span> Cluster name, region, and <code>kubectl get nodes</code> evidence.</td>
-            </tr>
-            <tr>
-              <td>Pods and services</td>
-              <td><span class="placeholder">TODO:</span> <code>kubectl get pods</code> and <code>kubectl get svc</code> evidence.</td>
-            </tr>
-            <tr>
-              <td>Ingress</td>
-              <td><span class="placeholder">TODO:</span> Load balancer URL and request evidence.</td>
-            </tr>
-            <tr>
-              <td>Cloud dependencies</td>
-              <td><span class="placeholder">TODO:</span> OCIR, PostgreSQL, Redis, OCI Queue, and OCI NoSQL evidence.</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section class="section">
-        <h2>Scalability</h2>
-        <p>
-          The scalability section must prove horizontal scaling, not only define manifests. The final evidence
-          should show a baseline pod count, load generation, HPA metric movement, and increased replicas.
-        </p>
-        <div class="two-column">
-          <div>
-            <h3>Evaluation service</h3>
-            <p>
-              <span class="placeholder">TODO:</span> Document CPU-based HPA configuration, min/max replicas,
-              load-test command, and before/after pod count evidence.
-            </p>
-            <p>
-              Evidence should include <code>kubectl get hpa</code>, <code>kubectl get pods</code>,
-              and load generation output.
-            </p>
-          </div>
-          <div>
-            <h3>Analytics service</h3>
-            <p>
-              <span class="placeholder">TODO:</span> Explain the chosen scaling signal for analytics.
-              If CPU HPA is used, justify why it is acceptable for the OCI implementation. If queue-depth
-              scaling is implemented, show queue backlog and consumer scaling evidence.
-            </p>
-            <p>
-              Evidence should include produced queue messages, analytics logs, scaling output, and NoSQL records.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <h2>Data Stores</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Store type</th>
-              <th>Used by</th>
-              <th>Reason</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>PostgreSQL</td>
-              <td>auth-service, flag-service, targeting-service</td>
-              <td>Relational consistency for API keys, feature flag definitions, and targeting rules.</td>
-            </tr>
-            <tr>
-              <td>Redis</td>
-              <td>evaluation-service</td>
-              <td>Fast cache for the high-read evaluation path.</td>
-            </tr>
-            <tr>
-              <td>OCI NoSQL Database</td>
-              <td>analytics-service</td>
-              <td>Flexible, scalable persistence for event-shaped analytics records.</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section class="section">
-        <h2>Challenges And Fixes</h2>
-        <p>
-          The imported services required updates before they could run in containers. The complete fix log
-          lives in <code>docs/fixes.md</code>; the final report should summarize the changes that matter for review.
-        </p>
-        <ul>
-          <li>Fixed Go module and import issues that blocked Docker builds.</li>
-          <li>Generated missing Go checksum files.</li>
-          <li>Updated Python dependency compatibility for Flask/Werkzeug and PostgreSQL authentication.</li>
-          <li>Added local bootstrap API key support for repeatable protected-service smoke tests.</li>
-          <li>Added local health-only analytics mode while OCI Queue and OCI NoSQL integration are completed.</li>
-        </ul>
-      </section>
-
-      <section class="section">
-        <h2>Evidence Index</h2>
-        <p>
-          Keep screenshots, terminal captures, and command outputs under <code>evidence/</code> when possible.
-          The final report can reference evidence paths or summarize the key output inline.
-        </p>
-        <table class="evidence-table">
-          <thead>
-            <tr>
-              <th>Evidence item</th>
-              <th>Status or link</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Docker Compose local run</td>
-              <td><span class="placeholder">TODO:</span> Add command output or evidence path.</td>
-            </tr>
-            <tr>
-              <td>OCIR image push</td>
-              <td><span class="placeholder">TODO:</span> Add repository/image evidence.</td>
-            </tr>
-            <tr>
-              <td>OKE deployment</td>
-              <td><span class="placeholder">TODO:</span> Add Kubernetes evidence.</td>
-            </tr>
-            <tr>
-              <td>Ingress request</td>
-              <td><span class="placeholder">TODO:</span> Add URL and response evidence.</td>
-            </tr>
-            <tr>
-              <td>Evaluation scaling</td>
-              <td><span class="placeholder">TODO:</span> Add HPA and pod-count evidence.</td>
-            </tr>
-            <tr>
-              <td>Analytics scaling and persistence</td>
-              <td><span class="placeholder">TODO:</span> Add queue, logs, and NoSQL evidence.</td>
-            </tr>
-            <tr>
-              <td>Demo video</td>
-              <td><span class="placeholder">TODO:</span> Add final video link.</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section class="section">
-        <h2>Final Conclusions</h2>
-        <p>
-          <span class="placeholder">TODO:</span> Summarize the final deployed architecture, what was validated,
-          how the scalability requirement was demonstrated, and what tradeoffs were made for Oracle Cloud.
-        </p>
-        <p>
-          Optional extra credit:
-          <span class="placeholder">TODO:</span> Add public Google Cloud Skills Boost profile or badge link if completed.
-        </p>
-      </section>
+      <p class="note">
+        Este relatório contém os itens solicitados na seção "Relatório de Entrega (.PDF ou .txt)"
+        do documento do Tech Challenge Fase 2 e inclui também o diagrama de arquitetura para facilitar a revisão.
+      </p>
     </main>
-
     <script>
       for (const image of document.querySelectorAll("img[data-fallback]")) {
         const fallback = document.getElementById(image.dataset.fallback);
