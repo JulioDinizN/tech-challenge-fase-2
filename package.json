@@ -1,0 +1,14 @@
+{
+  "name": "tech-challenge-fase-2",
+  "version": "0.1.0",
+  "private": true,
+  "description": "POSTECH Tech Challenge Fase 2 delivery workspace.",
+  "type": "module",
+  "scripts": {
+    "report:install": "playwright install chromium",
+    "report:pdf": "node scripts/render-report-pdf.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.60.0"
+  }
+}

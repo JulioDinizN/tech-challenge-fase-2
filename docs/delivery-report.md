@@ -1,5 +1,20 @@
 # Delivery Report
 
+Final submission format: PDF.
+
+The canonical report source is `docs/report.html`. Generate the review PDF with:
+
+```bash
+npm install
+npm run report:install
+npm run report:pdf
+```
+
+Generated output: `dist/delivery-report.pdf`.
+
+The generated PDF is ignored by Git because `dist/` is a build output folder.
+Keep this Markdown file as a working draft and use `docs/report.html` for the submitted report layout.
+
 ## Participants
 
 - Name:
