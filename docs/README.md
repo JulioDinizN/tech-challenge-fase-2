@@ -6,9 +6,7 @@ Recommended files:
 
 - `report.html` - canonical source for the final PDF report.
 - `architecture.md`
-- `requirements-progress.md`
 - `fixes.md`
-- `demo-script.md`
 - `delivery-report.md`
 
 Generated report output:
