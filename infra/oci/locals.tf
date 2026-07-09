@@ -33,7 +33,13 @@ check "subnets_belong_to_vcn" {
         var.network_cidrs.load_balancer,
         var.network_cidrs.workers,
         var.network_cidrs.data,
-      ] : cidrcontains(var.network_cidrs.vcn, cidrhost(cidr, 0))
+        ] : (
+        tonumber(split("/", cidr)[1]) >= tonumber(split("/", var.network_cidrs.vcn)[1]) &&
+        cidrhost(var.network_cidrs.vcn, 0) == cidrhost(
+          "${cidrhost(cidr, 0)}/${split("/", var.network_cidrs.vcn)[1]}",
+          0,
+        )
+      )
     ])
     error_message = "All subnet CIDRs must be contained by network_cidrs.vcn."
   }

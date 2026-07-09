@@ -101,3 +101,43 @@ Verification:
 - The local smoke flow validates the API key (`200`), creates a flag (`201`), creates a targeting rule (`201`), and evaluates it successfully (`200`, `result: true`).
 - Runtime logs confirm `evaluation-service` uses `ANALYTICS_QUEUE_DISABLED` and `analytics-service` starts with its worker disabled.
 - No Terraform plan/apply, OCI API call, image push, or cloud deployment was performed.
+
+## 2026-07-09 - Terraform Plan Compatibility
+
+Requirement: Preview the complete OCI infrastructure with `terraform plan` without deploying resources.
+
+Problem: The configuration validated syntactically but could not produce a complete plan with the configured OCI tenancy.
+
+Root causes:
+
+- No ignored `terraform.tfvars` existed, leaving nine required tenancy and regional values unset.
+- The subnet containment check used `cidrcontains`, which is not a Terraform function.
+- The default OKE worker shape was `VM.Standard.E4.Flex`, which was not offered by the current OKE node-pool options for the selected region/version.
+- OKE versions, worker images, OCIR namespace, region key, API allowlist, and compartment are tenancy-specific and cannot safely be committed as universal values.
+- The configured compartment did not contain an existing OCI Vault secret for the PostgreSQL administrator password.
+
+Decision:
+
+- Discover current OCI metadata through read-only CLI/API calls and keep the selected values in an ignored local `terraform.tfvars`.
+- Use `VM.Standard.E5.Flex` as the repository default/example while retaining live node-shape and image validation during planning.
+- Implement subnet containment using Terraform's native CIDR, prefix, string, and numeric functions.
+- Allow a clearly marked secret OCID placeholder only for resource-graph preview; never apply or present that saved plan as deployment-ready.
+
+Fix:
+
+- Added an ignored local planning file populated from the configured OCI profile for `us-ashburn-1`.
+- Selected OKE `v1.34.2` and a matching current Oracle Linux OKE image.
+- Restricted the public Kubernetes API input to the operator's current `/32` address.
+- Corrected the OKE worker default/example to `VM.Standard.E5.Flex`.
+- Replaced the invalid `cidrcontains` expression with a prefix-length and normalized-network comparison.
+- Added explicit non-deploying plan/show instructions and Vault-secret warnings to the OCI README.
+
+Verification:
+
+- `terraform fmt -check -recursive` passes.
+- `terraform validate` reports that the configuration is valid.
+- Read-only OCI data sources successfully validate the availability domains, OKE Kubernetes version, worker shape, and worker image.
+- `terraform plan -input=false -refresh=false -lock=false -out=togglemaster.tfplan` succeeds.
+- The saved preview reports `43 to add, 0 to change, 0 to destroy`.
+- The plan contains five OCIR repositories, one OKE cluster, one node pool, the VCN/network resources, three PostgreSQL systems, one OCI Cache cluster, one Queue, one NoSQL table, and one workload-identity policy.
+- `terraform apply` was not run and no OCI resource was created or modified.

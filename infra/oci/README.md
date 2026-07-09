@@ -89,6 +89,22 @@ oci ce node-pool-options get \
 
 Set `node_image_id` to an OKE image that matches both the selected Kubernetes version and node shape. Terraform preconditions reject unsupported versions, shapes, and image IDs during planning.
 
+## Preview the infrastructure without deploying
+
+After replacing every value in the ignored `terraform.tfvars`, generate and inspect a saved plan:
+
+```bash
+terraform plan \
+  -input=false \
+  -out=togglemaster.tfplan
+
+terraform show togglemaster.tfplan
+```
+
+Planning reads OCI metadata to validate current regions, availability domains, Kubernetes versions, node images, and shapes, but it does not create resources. Both `terraform.tfvars` and `*.tfplan` are ignored by Git.
+
+The PostgreSQL password input must point to a real OCI Vault secret before any apply. A syntactically valid placeholder can be used only to preview the resource graph; a plan containing that placeholder is deliberately not applyable and must be regenerated after the secret exists.
+
 ## Remote state before the first apply
 
 Real state can contain sensitive infrastructure metadata. Create a versioned, private OCI Object Storage bucket outside this stack, then:
@@ -102,7 +118,7 @@ Edit `backend.tf` first. Do not place OCI keys or tokens in it; use the OCI prof
 
 ## Future deployment workflow (not executed now)
 
-After the prerequisites, input review, and remote backend are complete:
+After the prerequisites, real Vault secret, input review, and remote backend are complete, regenerate the plan rather than applying an earlier development preview:
 
 ```bash
 terraform plan -out=togglemaster.tfplan

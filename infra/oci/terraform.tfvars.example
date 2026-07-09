@@ -17,6 +17,7 @@ api_allowed_cidrs = ["203.0.113.10/32"]
 # Discover supported versions and images with the commands in README.md.
 kubernetes_version = "v1.34.1"
 node_image_id       = "ocid1.image.oc1.sa-saopaulo-1.replace-me"
+node_shape          = "VM.Standard.E5.Flex"
 oke_cluster_type    = "ENHANCED_CLUSTER"
 
 # This secret must already exist. The password value is never stored in this file.

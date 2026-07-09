@@ -117,7 +117,7 @@ variable "node_image_id" {
 variable "node_shape" {
   description = "Compute shape for OKE managed worker nodes."
   type        = string
-  default     = "VM.Standard.E4.Flex"
+  default     = "VM.Standard.E5.Flex"
 }
 
 variable "node_pool_size" {
