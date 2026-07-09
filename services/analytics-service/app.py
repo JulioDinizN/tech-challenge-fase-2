@@ -1,151 +1,203 @@
+import json
+import logging
 import os
 import sys
 import threading
-import json
-import uuid
 import time
-import logging
-import boto3
-from botocore.exceptions import NoCredentialsError, ClientError
-from flask import Flask, jsonify
-from dotenv import load_dotenv
 
-# Configura o logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+import oci
+from dotenv import load_dotenv
+from flask import Flask, jsonify
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 log = logging.getLogger(__name__)
 
-# Carrega .env para desenvolvimento local
 load_dotenv()
 
-# --- Configuração ---
-WORKER_ENABLED = os.getenv("ANALYTICS_WORKER_ENABLED", "true").lower() not in ("0", "false", "no")
-AWS_REGION = os.getenv("AWS_REGION")
-SQS_QUEUE_URL = os.getenv("AWS_SQS_URL")
-DYNAMODB_TABLE_NAME = os.getenv("AWS_DYNAMODB_TABLE")
-DYNAMODB_ENDPOINT_URL = os.getenv("DYNAMODB_ENDPOINT_URL")
-SQS_ENDPOINT_URL = os.getenv("SQS_ENDPOINT_URL")
+WORKER_ENABLED = os.getenv("ANALYTICS_WORKER_ENABLED", "true").lower() not in (
+    "0",
+    "false",
+    "no",
+)
+OCI_REGION = os.getenv("OCI_REGION")
+OCI_QUEUE_OCID = os.getenv("OCI_QUEUE_OCID")
+OCI_QUEUE_MESSAGES_ENDPOINT = os.getenv("OCI_QUEUE_MESSAGES_ENDPOINT")
+OCI_NOSQL_TABLE = os.getenv("OCI_NOSQL_TABLE")
+OCI_COMPARTMENT_OCID = os.getenv("OCI_COMPARTMENT_OCID")
+OCI_AUTH_MODE = os.getenv("OCI_AUTH_MODE", "workload_identity").lower()
 
-if WORKER_ENABLED and not all([AWS_REGION, SQS_QUEUE_URL, DYNAMODB_TABLE_NAME]):
-    log.critical("Erro: AWS_REGION, AWS_SQS_URL, e AWS_DYNAMODB_TABLE devem ser definidos.")
-    sys.exit(1)
 
-# --- Clientes Boto3 ---
-# Criamos a sessão uma vez
-sqs_client = None
-dynamodb_client = None
+def validate_worker_configuration():
+    required = {
+        "OCI_REGION": OCI_REGION,
+        "OCI_QUEUE_OCID": OCI_QUEUE_OCID,
+        "OCI_QUEUE_MESSAGES_ENDPOINT": OCI_QUEUE_MESSAGES_ENDPOINT,
+        "OCI_NOSQL_TABLE": OCI_NOSQL_TABLE,
+    }
+    missing = [name for name, value in required.items() if not value]
+
+    if (
+        OCI_NOSQL_TABLE
+        and not OCI_NOSQL_TABLE.startswith("ocid1.nosqltable.")
+        and not OCI_COMPARTMENT_OCID
+    ):
+        missing.append("OCI_COMPARTMENT_OCID (required when OCI_NOSQL_TABLE is a name)")
+
+    if missing:
+        raise ValueError("Missing OCI configuration: " + ", ".join(missing))
+
+
+def configuration_and_signer():
+    if OCI_AUTH_MODE == "workload_identity":
+        signer = oci.auth.signers.get_oke_workload_identity_resource_principal_signer()
+        return {"region": OCI_REGION}, signer
+
+    if OCI_AUTH_MODE == "instance_principal":
+        signer = oci.auth.signers.InstancePrincipalsSecurityTokenSigner()
+        return {"region": OCI_REGION}, signer
+
+    if OCI_AUTH_MODE == "config_file":
+        config_file = os.getenv("OCI_CONFIG_FILE", oci.config.DEFAULT_LOCATION)
+        profile = os.getenv("OCI_CONFIG_PROFILE", oci.config.DEFAULT_PROFILE)
+        config = oci.config.from_file(config_file, profile)
+        if OCI_REGION:
+            config["region"] = OCI_REGION
+        return config, None
+
+    raise ValueError(
+        "OCI_AUTH_MODE must be workload_identity, instance_principal, or config_file"
+    )
+
+
+def build_oci_clients():
+    config, signer = configuration_and_signer()
+    auth_options = {"signer": signer} if signer else {}
+
+    queue = oci.queue.QueueClient(
+        config,
+        service_endpoint=OCI_QUEUE_MESSAGES_ENDPOINT.rstrip("/"),
+        retry_strategy=oci.retry.DEFAULT_RETRY_STRATEGY,
+        **auth_options,
+    )
+    nosql = oci.nosql.NosqlClient(
+        config,
+        retry_strategy=oci.retry.DEFAULT_RETRY_STRATEGY,
+        **auth_options,
+    )
+    return queue, nosql
+
+
+queue_client = None
+nosql_client = None
 
 if WORKER_ENABLED:
     try:
-        session = boto3.Session(region_name=AWS_REGION)
-        sqs_client = session.client("sqs", endpoint_url=SQS_ENDPOINT_URL)
-        dynamodb_client = session.client("dynamodb", endpoint_url=DYNAMODB_ENDPOINT_URL)
-        log.info(f"Clientes Boto3 inicializados na região {AWS_REGION}")
-    except NoCredentialsError:
-        log.critical("Credenciais da AWS não encontradas. Verifique seu ambiente.")
-        sys.exit(1)
-    except Exception as e:
-        log.critical(f"Erro ao inicializar o Boto3: {e}")
+        validate_worker_configuration()
+        queue_client, nosql_client = build_oci_clients()
+        log.info("OCI Queue and NoSQL clients initialized in region %s", OCI_REGION)
+    except Exception as error:
+        log.critical("Unable to initialize OCI clients: %s", error)
         sys.exit(1)
 else:
-    log.info("Worker de analytics desabilitado para execução local.")
+    log.info("Analytics worker disabled for local execution.")
 
 
-# --- SQS Worker ---
+def process_message(message, queue=None, nosql=None):
+    """Persist one OCI Queue message in NoSQL, then acknowledge it."""
+    queue = queue or queue_client
+    nosql = nosql or nosql_client
+    message_id = str(message.id)
 
-def process_message(message):
-    """ Processa uma única mensagem SQS e a insere no DynamoDB """
     try:
-        log.info(f"Processando mensagem ID: {message['MessageId']}")
-        body = json.loads(message['Body'])
-        
-        # Gera um ID único para o item no DynamoDB
-        event_id = str(uuid.uuid4())
-        
-        # Constrói o item no formato do DynamoDB
-        item = {
-            'event_id': {'S': event_id},
-            'user_id': {'S': body['user_id']},
-            'flag_name': {'S': body['flag_name']},
-            'result': {'BOOL': body['result']},
-            'timestamp': {'S': body['timestamp']}
-        }
-        
-        # Insere no DynamoDB
-        dynamodb_client.put_item(
-            TableName=DYNAMODB_TABLE_NAME,
-            Item=item
-        )
-        
-        log.info(f"Evento {event_id} (Flag: {body['flag_name']}) salvo no DynamoDB.")
-        
-        # Se tudo deu certo, deleta a mensagem da fila
-        sqs_client.delete_message(
-            QueueUrl=SQS_QUEUE_URL,
-            ReceiptHandle=message['ReceiptHandle']
-        )
-        
-    except json.JSONDecodeError:
-        log.error(f"Erro ao decodificar JSON da mensagem ID: {message['MessageId']}")
-        # Não deleta a mensagem, pode ser uma "poison pill"
-    except ClientError as e:
-        log.error(f"Erro do Boto3 (DynamoDB ou SQS) ao processar {message['MessageId']}: {e}")
-        # Não deleta a mensagem, tenta novamente
-    except Exception as e:
-        log.error(f"Erro inesperado ao processar {message['MessageId']}: {e}")
-        # Não deleta a mensagem, tenta novamente
+        log.info("Processing OCI Queue message ID: %s", message_id)
+        body = json.loads(message.content)
 
-def sqs_worker_loop():
-    """ Loop principal do worker que ouve a fila SQS """
-    log.info("Iniciando o worker SQS...")
+        required_fields = ("user_id", "flag_name", "result", "timestamp")
+        missing_fields = [field for field in required_fields if field not in body]
+        if missing_fields:
+            raise ValueError("missing event fields: " + ", ".join(missing_fields))
+        if not isinstance(body["result"], bool):
+            raise ValueError("event field result must be a boolean")
+
+        row = {
+            "event_id": message_id,
+            "user_id": str(body["user_id"]),
+            "flag_name": str(body["flag_name"]),
+            "result": body["result"],
+            "occurred_at": str(body["timestamp"]),
+        }
+        details = {"value": row}
+        if OCI_COMPARTMENT_OCID:
+            details["compartment_id"] = OCI_COMPARTMENT_OCID
+
+        nosql.update_row(
+            OCI_NOSQL_TABLE,
+            oci.nosql.models.UpdateRowDetails(**details),
+        )
+        queue.delete_message(OCI_QUEUE_OCID, message.receipt)
+
+        log.info("Event %s (flag: %s) stored in OCI NoSQL.", message_id, row["flag_name"])
+        return True
+    except (json.JSONDecodeError, ValueError) as error:
+        log.error("Invalid analytics event %s: %s", message_id, error)
+    except oci.exceptions.ServiceError as error:
+        log.error("OCI error while processing message %s: %s", message_id, error)
+    except Exception as error:
+        log.error("Unexpected error while processing message %s: %s", message_id, error)
+
+    # The message is deliberately not acknowledged so OCI Queue can redeliver it.
+    return False
+
+
+def queue_worker_loop():
+    log.info("Starting OCI Queue analytics worker...")
     while True:
         try:
-            # Long-polling: espera até 20s por mensagens
-            response = sqs_client.receive_message(
-                QueueUrl=SQS_QUEUE_URL,
-                MaxNumberOfMessages=10,  # Processa em lotes de até 10
-                WaitTimeSeconds=20
+            response = queue_client.get_messages(
+                OCI_QUEUE_OCID,
+                limit=10,
+                visibility_in_seconds=30,
+                timeout_in_seconds=20,
             )
-            
-            messages = response.get('Messages', [])
+            messages = response.data.messages
             if not messages:
-                # Nenhuma mensagem, continua o loop
                 continue
-                
-            log.info(f"Recebidas {len(messages)} mensagens.")
-            
+
+            log.info("Received %d OCI Queue messages.", len(messages))
             for message in messages:
                 process_message(message)
-                
-        except ClientError as e:
-            log.error(f"Erro do Boto3 no loop principal do SQS: {e}")
-            time.sleep(10) # Pausa antes de tentar novamente
-        except Exception as e:
-            log.error(f"Erro inesperado no loop principal do SQS: {e}")
+        except oci.exceptions.ServiceError as error:
+            log.error("OCI Queue worker error: %s", error)
+            time.sleep(10)
+        except Exception as error:
+            log.error("Unexpected analytics worker error: %s", error)
             time.sleep(10)
 
-# --- Servidor Flask (Apenas para Health Check) ---
 
 app = Flask(__name__)
 
-@app.route('/health')
-def health():
-    # Uma verificação de saúde real poderia checar a conexão com o DynamoDB/SQS
-    return jsonify({"status": "ok", "worker_enabled": WORKER_ENABLED})
 
-# --- Inicialização ---
+@app.route("/health")
+def health():
+    return jsonify(
+        {
+            "status": "ok",
+            "worker_enabled": WORKER_ENABLED,
+            "provider": "oci" if WORKER_ENABLED else "disabled",
+        }
+    )
+
 
 def start_worker():
-    """ Inicia o worker SQS em uma thread separada """
     if not WORKER_ENABLED:
         return
 
-    worker_thread = threading.Thread(target=sqs_worker_loop, daemon=True)
+    worker_thread = threading.Thread(target=queue_worker_loop, daemon=True)
     worker_thread.start()
 
-# Inicia o worker SQS em uma thread de background
-# Isso garante que ele inicie tanto com 'flask run' quanto com 'gunicorn'
+
 start_worker()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     port = int(os.getenv("PORT", 8005))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(host="0.0.0.0", port=port, debug=False)

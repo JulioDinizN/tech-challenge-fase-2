@@ -1,105 +1,63 @@
 # analytics-service (Python)
 
-Este é o serviço de análise (analytics) do projeto ToggleMaster. Ele é um *worker* de backend e não possui uma API pública (exceto `/health`).
+Worker de analytics do ToggleMaster. Ele faz long polling no OCI Queue, grava os eventos no OCI NoSQL Database e só remove a mensagem da fila depois que a escrita termina com sucesso. O endpoint `/health` existe para health checks.
 
-Sua única função é:
-1.  Ouvir constantemente a fila do **AWS SQS** (que o `evaluation-service` preenche).
-2.  Consumir as mensagens de evento da fila.
-3.  Gravar os dados de análise em uma tabela do **AWS DynamoDB**.
+## Execução local
 
-## 📦 Pré-requisitos (Local)
+O worker deve permanecer desligado quando não houver acesso ao OCI:
 
-* [Python](https://www.python.org/) (versão 3.9 ou superior)
-* **Credenciais da AWS:** Este serviço **DEVE** ter credenciais da AWS para acessar SQS e DynamoDB. Configure-as em seu terminal (via `aws configure`) ou defina as variáveis de ambiente:
-    * `AWS_ACCESS_KEY_ID`
-    * `AWS_SECRET_ACCESS_KEY`
-    * `AWS_SESSION_TOKEN` (se estiver usando o AWS Academy)
-* **Recursos da AWS:** Você precisa ter criado a Fila SQS e a Tabela DynamoDB no console.
-
-## 🚀 Preparando o DynamoDB
-
-Este serviço espera que uma tabela específica exista no DynamoDB.
-
-**Nome da Tabela:** `ToggleMasterAnalytics`
-**Chave Primária (Partition Key):** `event_id` (do tipo String)
-
-Você pode criar esta tabela usando o console da AWS ou com o seguinte comando da AWS CLI:
-
-```bash
-aws dynamodb create-table \
-    --table-name ToggleMasterAnalytics \
-    --attribute-definitions \
-        AttributeName=event_id,AttributeType=S \
-    --key-schema \
-        AttributeName=event_id,KeyType=HASH \
-    --provisioned-throughput \
-        ReadCapacityUnits=1,WriteCapacityUnits=1
-```
-(Nota: O throughput provisionado acima é o mínimo possível, ideal para o free tier/testes).
-
-## 🚀 Rodando Localmente
-**1. Clone o repositório** e entre na pasta `analytics-service`.
-
-**2. Configure as Variáveis de Ambiente:** Crie um arquivo chamado `.env` na raiz desta pasta (`analytics-service/`) com o seguinte conteúdo. **Garanta que suas credenciais da AWS também estejam configuradas no seu ambiente.**
-```.env
-# Porta que este serviço (health check) irá rodar
-PORT="8005"
-
-# --- Configuração da AWS ---
-# Cole a URL da fila SQS que você criou
-AWS_SQS_URL="httpsiso://[sqs.us-east-1.amazonaws.com/123456789012/sua-fila](https://sqs.us-east-1.amazonaws.com/123456789012/sua-fila)"
-
-# Nome da tabela DynamoDB que você criou
-AWS_DYNAMODB_TABLE="ToggleMasterAnalytics"
-
-# Região dos seus serviços SQS e DynamoDB
-AWS_REGION="us-east-1"
+```env
+PORT=8005
+ANALYTICS_WORKER_ENABLED=false
 ```
 
-**3. Instale as Dependências:**
+Assim, o serviço e seu health check funcionam sem credenciais ou recursos cloud:
+
 ```bash
 pip install -r requirements.txt
-```
-
-**4. Inicie o Serviço:**
-```bash
 gunicorn --bind 0.0.0.0:8005 app:app
-```
-O servidor estará rodando em `http://localhost:8005`. Você verá logs no terminal assim que o worker SQS iniciar e (eventualmente) processar mensagens.
-
-## 🧪 Testando o Serviço
-
-Testar este serviço é diferente. Você não vai chamar uma API dele.
-
-**1. Verifique a Saúde:**
-```bash
 curl http://localhost:8005/health
 ```
-Saída esperada: `{"status":"ok"}``
 
-**2. Gere Eventos:**
+Resposta esperada:
 
-- Vá para o `evaluation-service` (que deve estar rodando) e faça algumas requisições de avaliação:
-```bash
-curl "http://localhost:8004/evaluate?user_id=test-user-1&flag_name=enable-new-dashboard"
-curl "http://localhost:8004/evaluate?user_id=test-user-2&flag_name=enable-new-dashboard"
-```
-- **Alternativa:** Envie uma mensagem manualmente pelo Console da AWS SQS.
-
-**3. Observe os Logs:**
-
-No terminal do `analytics-service`, você deverá ver os logs aparecendo, indicando que as mensagens foram recebidas e salvas no DynamoDB:
-```bash
-INFO:Iniciando o worker SQS...
-INFO:Recebidas 2 mensagens.
-INFO:Processando mensagem ID: ...
-INFO:Evento ... (Flag: enable-new-dashboard) salvo no DynamoDB.
-INFO:Processando mensagem ID: ...
-INFO:Evento ... (Flag: enable-new-dashboard) salvo no DynamoDB.
+```json
+{"provider":"disabled","status":"ok","worker_enabled":false}
 ```
 
-**4. Verifique o DynamoDB:**
+O `docker-compose.yml` da raiz já usa esse modo.
 
-Vá até o console da AWS, abra o **DynamoDB**, selecione a tabela `ToggleMasterAnalytics` e clique em "Explore table items".
+## Configuração OCI/OKE
 
-Você verá os itens que o worker acabou de inserir.
+O pod deve usar a service account `analytics-service`, autorizada pela policy de workload identity criada pelo Terraform.
+
+```env
+ANALYTICS_WORKER_ENABLED=true
+OCI_AUTH_MODE=workload_identity
+OCI_REGION=<regiao-oci>
+OCI_QUEUE_OCID=ocid1.queue...
+OCI_QUEUE_MESSAGES_ENDPOINT=https://cell-1.queue.messaging.<regiao>.oci.oraclecloud.com
+OCI_NOSQL_TABLE=ToggleMasterAnalytics
+OCI_COMPARTMENT_OCID=ocid1.compartment...
+```
+
+`OCI_COMPARTMENT_OCID` é obrigatório quando `OCI_NOSQL_TABLE` contém o nome da tabela. Ele pode ser omitido quando a tabela é configurada diretamente pelo OCID.
+
+Modos alternativos:
+
+- `OCI_AUTH_MODE=instance_principal` em uma instância OCI autorizada;
+- `OCI_AUTH_MODE=config_file`, com `OCI_CONFIG_FILE` e `OCI_CONFIG_PROFILE` opcionais.
+
+Os valores devem vir dos outputs Terraform `evaluation_queue` e `analytics_table`. Com workload identity, não há chave OCI estática no pod.
+
+## Persistência e reentrega
+
+O ID da mensagem OCI é usado como `event_id`, tornando uma reentrega idempotente para a chave primária da tabela. A linha possui:
+
+- `event_id`
+- `user_id`
+- `flag_name`
+- `result`
+- `occurred_at`
+
+Eventos inválidos ou falhas no OCI NoSQL não são reconhecidos; a mensagem fica disponível para nova tentativa conforme a política da fila.

@@ -7,9 +7,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/go-redis/redis/v8"
 	"github.com/joho/godotenv"
 )
@@ -20,8 +17,7 @@ var ctx = context.Background()
 // App struct para injeção de dependência
 type App struct {
 	RedisClient         *redis.Client
-	SqsSvc              *sqs.SQS
-	SqsQueueURL         string
+	EventPublisher      AnalyticsEventPublisher
 	HttpClient          *http.Client
 	FlagServiceURL      string
 	TargetingServiceURL string
@@ -51,18 +47,8 @@ func main() {
 		log.Fatal("TARGETING_SERVICE_URL deve ser definida")
 	}
 
-	// SQS é opcional no dev local, mas obrigatório em prod
-	sqsQueueURL := os.Getenv("AWS_SQS_URL")
-	awsRegion := os.Getenv("AWS_REGION")
-	if sqsQueueURL == "" {
-		log.Println("Atenção: AWS_SQS_URL não definida. Eventos não serão enviados.")
-	}
-	if awsRegion == "" && sqsQueueURL != "" {
-		log.Fatal("AWS_REGION deve ser definida para usar SQS")
-	}
-
 	// --- Inicializa Clientes ---
-	
+
 	// Cliente Redis
 	opt, err := redis.ParseURL(redisURL)
 	if err != nil {
@@ -74,15 +60,15 @@ func main() {
 	}
 	log.Println("Conectado ao Redis com sucesso!")
 
-	// Cliente SQS (AWS SDK)
-	var sqsSvc *sqs.SQS
-	if sqsQueueURL != "" {
-		sess, err := session.NewSession(&aws.Config{Region: aws.String(awsRegion)})
-		if err != nil {
-			log.Fatalf("Não foi possível criar sessão AWS: %v", err)
-		}
-		sqsSvc = sqs.New(sess)
-		log.Println("Cliente SQS inicializado com sucesso.")
+	// Publicador OCI Queue. Sem OCI_QUEUE_OCID, o modo local apenas registra os eventos.
+	eventPublisher, err := newAnalyticsEventPublisherFromEnv()
+	if err != nil {
+		log.Fatalf("Não foi possível inicializar o publicador OCI Queue: %v", err)
+	}
+	if eventPublisher == nil {
+		log.Println("OCI Queue não configurada. Eventos de analytics serão registrados apenas no log.")
+	} else {
+		log.Println("Publicador OCI Queue inicializado com sucesso.")
 	}
 
 	// Cliente HTTP (com timeout)
@@ -93,8 +79,7 @@ func main() {
 	// Cria a instância da App
 	app := &App{
 		RedisClient:         rdb,
-		SqsSvc:              sqsSvc,
-		SqsQueueURL:         sqsQueueURL,
+		EventPublisher:      eventPublisher,
 		HttpClient:          httpClient,
 		FlagServiceURL:      flagSvcURL,
 		TargetingServiceURL: targetingSvcURL,

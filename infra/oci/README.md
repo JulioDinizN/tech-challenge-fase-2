@@ -25,11 +25,10 @@ Terraform provisions OCI resources only. It does not yet:
 - install Metrics Server or Nginx Ingress Controller;
 - apply Kubernetes manifests;
 - create the three application databases or execute the imported SQL schemas;
-- adapt `evaluation-service` and `analytics-service` from AWS SDKs to OCI Queue and OCI NoSQL SDKs;
 - generate an OCIR image-pull secret;
 - deploy any application or infrastructure.
 
-Those are later implementation steps. In particular, the current AWS SDK code cannot use the OCI Queue and NoSQL resources merely by changing environment variables.
+Those are later implementation steps. The application code already supports OCI Queue and OCI NoSQL, but the future Kubernetes manifests must inject the Terraform output values and use the `evaluation-service` and `analytics-service` workload-identity service accounts.
 
 ## Architecture decisions
 

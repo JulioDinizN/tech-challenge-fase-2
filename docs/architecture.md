@@ -29,4 +29,4 @@ High-level architecture notes for the final report.
 
 The delivery target is Oracle Cloud Infrastructure using OKE, OCIR, OCI Queue, OCI NoSQL Database, and OCI-compatible PostgreSQL/Redis services.
 
-The queue and analytics integration should be implemented and documented with Oracle Cloud service names.
+The evaluation service publishes events to OCI Queue. The analytics service consumes those messages, persists them in OCI NoSQL Database, and acknowledges each message only after the row update succeeds.

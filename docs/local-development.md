@@ -111,4 +111,6 @@ Expected result:
 
 ## Local Analytics Note
 
-`analytics-service` runs locally with `ANALYTICS_WORKER_ENABLED=false` so the required 9-container stack can start without a local queue emulator. DynamoDB Local is still included as the required local NoSQL dependency. Queue and NoSQL provider integration will be completed in the OCI cloud integration requirement.
+`evaluation-service` leaves its OCI Queue publisher disabled when `OCI_QUEUE_OCID` is absent. It still evaluates flags and records the analytics event in its log.
+
+`analytics-service` runs locally with `ANALYTICS_WORKER_ENABLED=false`, so its health endpoint remains available without OCI credentials or a local Queue emulator. The worker is enabled only in OKE. DynamoDB Local remains in Compose to preserve the nine-container shape requested by the challenge, but the OCI-adapted analytics worker does not write to it.

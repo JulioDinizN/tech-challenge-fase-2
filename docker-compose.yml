@@ -118,7 +118,6 @@ services:
       FLAG_SERVICE_URL: http://flag-service:8002
       TARGETING_SERVICE_URL: http://targeting-service:8003
       SERVICE_API_KEY: ${SERVICE_API_KEY:-tm_key_local_development_only}
-      AWS_EC2_METADATA_DISABLED: "true"
     ports:
       - "8004:8004"
     depends_on:
@@ -140,7 +139,6 @@ services:
     environment:
       PORT: "8005"
       ANALYTICS_WORKER_ENABLED: ${ANALYTICS_WORKER_ENABLED:-false}
-      AWS_EC2_METADATA_DISABLED: "true"
     ports:
       - "8005:8005"
     depends_on:

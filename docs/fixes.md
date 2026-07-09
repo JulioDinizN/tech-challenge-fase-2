@@ -49,3 +49,55 @@ Verification:
 - `docker compose ps` shows the five app containers plus `auth-db`, `app-db`, `redis`, and `dynamodb-local`.
 - Health checks pass for all five application services.
 - A local smoke test validates the bootstrapped API key, creates a flag, creates a targeting rule, and evaluates the flag successfully through `evaluation-service`.
+
+## 2026-07-09 - OCI Queue And NoSQL Application Integration
+
+Requirement: Prepare the analytics event flow for the OCI infrastructure without deploying it and without breaking local development.
+
+Problem: Terraform provisioned OCI Queue and OCI NoSQL resources, but `evaluation-service` and `analytics-service` still used the AWS SQS, DynamoDB, and credential APIs. OCI resources cannot be consumed by changing AWS endpoint variables because the request models, authentication, queue addressing, and NoSQL row formats are different.
+
+Root causes:
+
+- `evaluation-service` was coupled directly to the AWS SQS client.
+- `analytics-service` expected the AWS SQS message dictionary and DynamoDB typed-attribute format.
+- OCI Queue requires both the queue OCID and its queue-specific messages endpoint.
+- OKE workloads need resource-principal authentication instead of static cloud credentials in the pods.
+- The Terraform NoSQL schema uses `occurred_at`, while the former DynamoDB item used `timestamp`.
+- The latest OCI Go SDK releases require a newer Go toolchain than the service's Go 1.21 baseline.
+
+Decision:
+
+- Use the native OCI SDKs and OKE workload identity for the future cloud runtime.
+- Keep the analytics event JSON contract unchanged between producer and consumer.
+- Use the OCI Queue message ID as the NoSQL `event_id`, making a redelivery overwrite the same primary-key row instead of creating a duplicate.
+- Acknowledge a Queue message only after the NoSQL update succeeds; invalid events and OCI failures remain available for retry and eventual dead-letter handling.
+- Preserve a cloud-independent local mode: evaluation logs events when no Queue OCID is configured, and the analytics worker remains disabled by `ANALYTICS_WORKER_ENABLED=false`.
+
+Fix:
+
+- Replaced the AWS SQS dependency in `evaluation-service` with an `AnalyticsEventPublisher` interface and an OCI Queue implementation.
+- Added OKE workload identity, instance principal, and OCI config-file authentication modes.
+- Pinned `github.com/oracle/oci-go-sdk/v65` to `v65.101.0`, which remains compatible with Go 1.21.
+- Replaced `boto3` in `analytics-service` with the OCI Python SDK.
+- Added OCI Queue long polling, OCI NoSQL row updates, post-write message acknowledgement, validation, and retry-safe failure behavior.
+- Added producer and consumer unit tests.
+- Removed obsolete AWS metadata environment variables from Compose and documented the OCI configuration and local fallback behavior.
+- Updated the OCI infrastructure boundary documentation to show that application adaptation is complete while Kubernetes wiring and deployment remain pending.
+
+Local compatibility:
+
+- These changes do not require OCI to run the project locally.
+- Docker Compose does not inject the placeholder OCI values from `.env.example` into either service.
+- `evaluation-service` remains fully functional without `OCI_QUEUE_OCID`; only external analytics publication is skipped and logged.
+- `analytics-service` continues serving `/health` with its worker disabled.
+- DynamoDB Local remains in Compose only to preserve the nine-container challenge topology; the OCI-adapted worker does not use it.
+
+Verification:
+
+- `go test ./...` passes for `evaluation-service` using Go 1.21.
+- `python -m unittest -v` passes both `analytics-service` message-processing tests inside its built image.
+- `docker compose build evaluation-service analytics-service` completes successfully.
+- An isolated `docker compose up -d --build --wait` starts all nine containers and reports all health checks passing.
+- The local smoke flow validates the API key (`200`), creates a flag (`201`), creates a targeting rule (`201`), and evaluates it successfully (`200`, `result: true`).
+- Runtime logs confirm `evaluation-service` uses `ANALYTICS_QUEUE_DISABLED` and `analytics-service` starts with its worker disabled.
+- No Terraform plan/apply, OCI API call, image push, or cloud deployment was performed.
