@@ -1,0 +1,38 @@
+# Copy this file to terraform.tfvars and replace every placeholder before planning.
+# terraform.tfvars is ignored by Git and must never contain committed credentials.
+
+region         = "sa-saopaulo-1"
+tenancy_ocid   = "ocid1.tenancy.oc1..replace-me"
+compartment_id = "ocid1.compartment.oc1..replace-me"
+
+oci_config_profile = "DEFAULT"
+oci_auth           = "ApiKey"
+
+ocir_namespace  = "replace-with-object-storage-namespace"
+ocir_region_key = "gru"
+
+# Replace with the operator's current public IP in /32 notation.
+api_allowed_cidrs = ["203.0.113.10/32"]
+
+# Discover supported versions and images with the commands in README.md.
+kubernetes_version = "v1.34.1"
+node_image_id       = "ocid1.image.oc1.sa-saopaulo-1.replace-me"
+oke_cluster_type    = "ENHANCED_CLUSTER"
+
+# This secret must already exist. The password value is never stored in this file.
+postgres_password_secret_id = "ocid1.vaultsecret.oc1.sa-saopaulo-1.replace-me"
+
+# Development-sized defaults are intentionally explicit for cost review.
+node_pool_size             = 2
+node_ocpus                 = 1
+node_memory_in_gbs         = 8
+postgres_instance_count    = 1
+postgres_ocpus             = 1
+postgres_memory_in_gbs     = 16
+redis_node_count           = 1
+redis_node_memory_in_gbs   = 2
+
+freeform_tags = {
+  Environment = "development"
+  Owner       = "grupo-191"
+}

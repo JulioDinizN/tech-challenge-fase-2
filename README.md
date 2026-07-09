@@ -48,6 +48,12 @@ The local stack runs the challenge-required shape:
 
 See `docs/local-development.md` for smoke-test commands.
 
+## OCI infrastructure development
+
+The Terraform implementation for the OCI resource layer is under `infra/oci/`. It covers networking, OKE, five OCIR repositories, three PostgreSQL systems, OCI Cache, OCI Queue, OCI NoSQL, and workload-identity policies.
+
+It has been developed for review and static validation only; no OCI resources have been deployed. See `infra/oci/README.md` before running any Terraform planning or deployment command.
+
 ## Imported services
 
 The initial service source code was imported from the public FIAP ToggleMaster repositories:
