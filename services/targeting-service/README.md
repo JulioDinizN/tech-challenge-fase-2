@@ -34,6 +34,8 @@ Este é o serviço de regras de segmentação (targeting) do projeto ToggleMaste
     AUTH_SERVICE_URL="http://localhost:8001"
     ```
 
+    `DATABASE_URL` mantém prioridade e o Compose continua usando esse formato. No OKE ela é omitida e o pool recebe `DB_HOST`, `DB_PORT` (padrão `5432`), `DB_NAME`, `DB_USER`, `DB_PASSWORD` e `DB_SSLMODE` (padrão `require`) separadamente. Apenas `DB_PASSWORD` vem do Secret sincronizado pelo OCI Vault CSI.
+
 4.  **Instale as Dependências:**
     ```bash
     pip install -r requirements.txt

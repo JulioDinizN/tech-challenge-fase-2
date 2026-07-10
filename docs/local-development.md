@@ -114,3 +114,20 @@ Expected result:
 `evaluation-service` leaves its OCI Queue publisher disabled when `OCI_QUEUE_OCID` is absent. It still evaluates flags and records the analytics event in its log.
 
 `analytics-service` runs locally with `ANALYTICS_WORKER_ENABLED=false`, so its health endpoint remains available without OCI credentials or a local Queue emulator. The worker is enabled only in OKE. DynamoDB Local remains in Compose to preserve the nine-container shape requested by the challenge, but the OCI-adapted analytics worker does not write to it.
+
+## Compatibilidade da configuração PostgreSQL
+
+O Compose continua fornecendo `DATABASE_URL` para auth, flag e targeting. Ela tem prioridade, portanto nenhuma credencial OCI ou mudança no `.env` é necessária para desenvolvimento local.
+
+Somente no OKE os serviços usam componentes separados:
+
+```env
+DB_HOST=<endpoint-privado>
+DB_PORT=5432
+DB_NAME=<banco-do-servico>
+DB_USER=<usuario-restrito>
+DB_PASSWORD=<Secret-sincronizado-do-Vault>
+DB_SSLMODE=require
+```
+
+Esse contrato evita colocar senha em ConfigMap/Terraform e mantém o mesmo código executável nos dois ambientes.

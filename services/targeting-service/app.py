@@ -10,6 +10,8 @@ from dotenv import load_dotenv
 from functools import wraps
 import logging
 
+from database_config import build_database_config
+
 # Configura o logging
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -20,16 +22,21 @@ load_dotenv()
 app = Flask(__name__)
 
 # --- Configuração ---
-DATABASE_URL = os.getenv("DATABASE_URL")
 AUTH_SERVICE_URL = os.getenv("AUTH_SERVICE_URL")
 
-if not DATABASE_URL or not AUTH_SERVICE_URL:
-    log.critical("Erro: DATABASE_URL e AUTH_SERVICE_URL devem ser definidos.")
+if not AUTH_SERVICE_URL:
+    log.critical("Erro: AUTH_SERVICE_URL deve ser definida.")
+    sys.exit(1)
+
+try:
+    DATABASE_CONFIG = build_database_config()
+except ValueError as error:
+    log.critical(f"Erro: configuração do PostgreSQL inválida: {error}")
     sys.exit(1)
 
 # --- Pool de Conexão com o Banco ---
 try:
-    pool = SimpleConnectionPool(1, 5, dsn=DATABASE_URL)
+    pool = SimpleConnectionPool(1, 5, **DATABASE_CONFIG)
     log.info("Pool de conexões com o PostgreSQL (targeting) inicializado.")
 except psycopg2.OperationalError as e:
     log.critical(f"Erro fatal ao conectar ao PostgreSQL: {e}")

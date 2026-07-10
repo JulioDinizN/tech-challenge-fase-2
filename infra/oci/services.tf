@@ -25,8 +25,9 @@ resource "oci_psql_db_system" "services" {
     username = var.postgres_admin_username
 
     password_details {
-      password_type = "VAULT_SECRET"
-      secret_id     = var.postgres_password_secret_id
+      password_type  = "VAULT_SECRET"
+      secret_id      = oci_vault_secret.postgres_admin_password[each.key].id
+      secret_version = oci_vault_secret.postgres_admin_password[each.key].current_version_number
     }
   }
 

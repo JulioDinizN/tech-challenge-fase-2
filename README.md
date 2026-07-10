@@ -1,60 +1,71 @@
 # POSTECH Tech Challenge - Fase 2
 
-Submission repository for the Phase 2 Tech Challenge.
+Repositório de entrega do ToggleMaster, Grupo 191. O projeto reúne os cinco microsserviços, o ambiente local exigido com nove contêineres e a infraestrutura reproduzível para Oracle Cloud Infrastructure (OCI).
 
-## Structure
+## Estado da entrega
 
-This repository is organized to follow the Tech Challenge requirements one by one.
+| Etapa | Estado |
+| --- | --- |
+| Dockerfiles e Docker Compose local | Implementado e validado |
+| Adaptação Queue/NoSQL para OCI | Implementada com fallback local |
+| Terraform de rede, OKE, OCIR e dados | Implementado; plan aprovado com 53 creates, 0 changes, 0 destroys |
+| OCI Vault e segredos gerados | Implementados no Terraform; não provisionados |
+| Kubernetes base e overlay OCI | Implementados e renderizados localmente |
+| Scripts de build, deploy, teste e destroy | Implementados; execução cloud pendente |
+| Evidências, vídeo e link final no PDF | Pendentes da janela de demonstração |
+
+Nenhum recurso cloud foi criado por este repositório até o momento. `terraform apply`, publicação no OCIR e `kubectl apply` só devem ser executados durante a janela autorizada de demonstração, após revisão do plano e dos custos.
+
+## Estrutura
 
 ```text
 .
-|-- services/                 # Imported application source code
-|-- docker/                   # Docker notes and shared containerization decisions
-|-- docker-compose.yml        # Local 9-container environment
-|-- k8s/                      # Kubernetes manifests
-|   |-- base/                 # Common manifests
-|   `-- overlays/             # Environment-specific values
-|-- infra/                    # Cloud provisioning notes and commands
-|   `-- oci/                  # Oracle Cloud Infrastructure setup
-|-- scripts/                  # Repeatable local/cloud helper scripts
-|-- docs/                     # Architecture, decisions, fixes, and delivery report
-`-- evidence/                 # Command outputs/screenshots used in final delivery
+|-- services/                 # Código e Dockerfile dos cinco microsserviços
+|-- docker/                   # Inicialização dos bancos locais
+|-- docker-compose.yml        # Ambiente local de nove contêineres
+|-- k8s/                      # Base Kubernetes e overlay OCI/OKE
+|-- infra/oci/                # Infraestrutura OCI em Terraform
+|-- scripts/                  # Validação, deploy, testes, evidências e teardown
+|-- docs/                     # Arquitetura, correções, roteiro e relatório
+`-- evidence/                 # Somente evidências revisadas e sanitizadas
 ```
 
-## Execution order
+## Fluxo de execução
 
-1. Containerize each service with a Dockerfile.
-2. Create the root Docker Compose setup for local validation.
-3. Provision the cloud infrastructure.
-4. Build and publish images to OCIR.
-5. Create Kubernetes manifests for deployments, services, secrets, config maps, ingress, and autoscaling.
-6. Validate scaling and data persistence.
-7. Finish the report and video evidence.
+1. Validar localmente com `./scripts/validate-delivery.sh` e Docker Compose.
+2. Revisar custos, quotas, `terraform.tfvars` e o novo `terraform plan`.
+3. Após autorização explícita, aplicar o Terraform e criar o kubeconfig do OKE.
+4. Publicar as cinco imagens com tag imutável no OCIR.
+5. Implantar add-ons e workloads com `scripts/deploy-oke.sh`.
+6. Executar smoke test, carga, evidências e gravar o vídeo de até 20 minutos.
+7. Inserir o link do vídeo em `docs/report.html`, gerar o PDF final e revisar placeholders.
+8. Remover primeiro os recursos Kubernetes/LB e depois executar o `terraform destroy` pelo script documentado.
 
-## Local execution
+O roteiro operacional completo está em `docs/video-runbook.md`.
+
+## Execução local
 
 ```bash
 cp .env.example .env
 docker compose up --build
 ```
 
-The local stack runs the challenge-required shape:
+O ambiente mantém exatamente a topologia local exigida:
 
-- 5 application containers
-- 4 dependency containers:
-  - 2 PostgreSQL containers
-  - 1 Redis container
-  - 1 DynamoDB Local container
+- cinco contêineres de aplicação;
+- dois PostgreSQL, um Redis e um DynamoDB Local.
 
-See `docs/local-development.md` for smoke-test commands.
+As adaptações para Vault e OCI não quebram o desenvolvimento local: `DATABASE_URL` continua com prioridade; Queue e worker OCI permanecem opcionais no Compose. Consulte `docs/local-development.md`.
 
-## OCI infrastructure development
+## Infraestrutura OCI
 
-The Terraform implementation for the OCI resource layer is under `infra/oci/`. It covers networking, OKE, five OCIR repositories, three PostgreSQL systems, OCI Cache, OCI Queue, OCI NoSQL, and workload-identity policies.
+O Terraform em `infra/oci/` cobre VCN, OKE, cinco repositórios OCIR, três sistemas OCI Database with PostgreSQL, OCI Cache, Queue, NoSQL, Vault, chave AES de software, oito segredos gerados pelo OCI e policies de Workload Identity.
 
-It has been developed for review and static validation only; no OCI resources have been deployed. See `infra/oci/README.md` before running any Terraform planning or deployment command.
+O overlay `k8s/overlays/oci/` transforma outputs não secretos do Terraform em ConfigMaps, referências de imagem e `SecretProviderClass`. O Secrets Store CSI sincroniza os valores do Vault em Secrets nativos do Kubernetes; nenhum valor secreto é renderizado ou versionado.
 
-## Imported services
+Consulte `infra/oci/README.md`, `k8s/README.md` e `scripts/README.md` antes da implantação.
+
+## Origem dos microsserviços
 
 The initial service source code was imported from the public FIAP ToggleMaster repositories:
 
@@ -66,4 +77,4 @@ The initial service source code was imported from the public FIAP ToggleMaster r
 | evaluation-service | https://github.com/FIAP-TCs/evaluation-service | `5e8ade059f69650d2e8cfbefad0a83cfac25f0a9` |
 | analytics-service | https://github.com/FIAP-TCs/analytics-service | `212d7e9b7e50f881c4022bc9e8d2722f08a2a3e2` |
 
-Each service was imported under `services/` with its original `.git` directory removed so this repository can track the full challenge implementation as a single project.
+Cada serviço foi importado em `services/` sem seu diretório `.git`, permitindo versionar a entrega completa em um único repositório. As mudanças necessárias nos microsserviços estão registradas em `docs/fixes.md`; ajustes gerais de infraestrutura ficam documentados em `infra/` e `k8s/`.

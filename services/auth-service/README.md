@@ -31,6 +31,10 @@ Este é o serviço de autenticação do projeto ToggleMaster. Ele é responsáve
     MASTER_KEY="admin-secreto-123"
     ```
 
+    `DATABASE_URL` continua sendo a opção preferencial no ambiente local. No OKE ela pode ser omitida e substituída por `DB_HOST`, `DB_PORT` (padrão `5432`), `DB_NAME`, `DB_USER`, `DB_PASSWORD` e `DB_SSLMODE` (padrão `require`). Isso permite manter somente a senha no Secret sincronizado do OCI Vault.
+
+    `BOOTSTRAP_API_KEY` é opcional e cria de forma idempotente a chave usada internamente pelo `evaluation-service`; no OKE ela vem do mesmo segredo do Vault consumido pelos dois serviços.
+
 4.  **Instale as Dependências:**
     ```bash
     go mod tidy

@@ -42,6 +42,8 @@ Modos alternativos de autenticação, úteis fora do OKE:
 
 Os valores de fila vêm do output Terraform `evaluation_queue`. Não é necessário fornecer chaves OCI ao pod quando workload identity estiver configurada.
 
+`SERVICE_API_KEY` é sincronizada do OCI Vault no Secret Kubernetes `evaluation-runtime-secrets`. Ela é o mesmo valor usado por `BOOTSTRAP_API_KEY` no `auth-service`; o valor não aparece nos manifests nem nos outputs Terraform.
+
 ## Endpoints
 
 ```bash

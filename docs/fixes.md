@@ -101,3 +101,46 @@ Verification:
 - The local smoke flow validates the API key (`200`), creates a flag (`201`), creates a targeting rule (`201`), and evaluates it successfully (`200`, `result: true`).
 - Runtime logs confirm `evaluation-service` uses `ANALYTICS_QUEUE_DISABLED` and `analytics-service` starts with its worker disabled.
 - No Terraform plan/apply, OCI API call, image push, or cloud deployment was performed.
+
+## 2026-07-09 - Configuração PostgreSQL compatível com OCI Vault
+
+Requirement: Permitir que os três microsserviços relacionais usem os bancos gerenciados e os Secrets do Kubernetes/Vault sem quebrar o ambiente local.
+
+Problem: `auth-service`, `flag-service` e `targeting-service` aceitavam somente `DATABASE_URL`. Para usar uma senha sincronizada do OCI Vault seria necessário montar uma URL completa com credencial dentro de um Secret, duplicando host, porta, usuário e banco e dificultando a separação entre configuração não secreta e segredo.
+
+Root causes:
+
+- o contrato importado concentrava configuração e senha em uma única string;
+- Kubernetes não expande referências de Secret dentro do valor de outra variável;
+- montar `DATABASE_URL` pelo Terraform colocaria o valor sensível no plano e no state;
+- senhas com caracteres especiais exigem escaping correto quando incluídas em URL.
+
+Decision:
+
+- manter `DATABASE_URL` com prioridade para retrocompatibilidade local;
+- quando ela não existir, aceitar `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` e `DB_SSLMODE`;
+- manter host, porta, banco, usuário e SSL no ConfigMap e somente `DB_PASSWORD` no Secret;
+- usar conexão TLS (`DB_SSLMODE=require`) como padrão do modo por componentes.
+
+Fix:
+
+- `auth-service` ganhou um construtor de DSN que valida os campos, aceita IPv6 e faz escaping seguro de usuário/senha;
+- `flag-service` e `targeting-service` passaram a fornecer os parâmetros separados diretamente ao pool `psycopg2`, sem reconstruir URL com senha;
+- foram adicionados testes de prioridade de `DATABASE_URL`, defaults, caracteres especiais, porta inválida e erros que não vazam senha;
+- o Compose não foi alterado e continua injetando as mesmas `DATABASE_URL` com `sslmode=disable` para os PostgreSQL locais.
+
+Local compatibility:
+
+- quem usa `.env` ou Docker Compose não precisa trocar nenhuma variável;
+- `DATABASE_URL` continua sendo escolhida antes de qualquer `DB_*`;
+- o novo modo só é ativado no overlay OKE, onde a senha vem do OCI Vault CSI.
+
+Verification:
+
+- `go test ./...` passou no `auth-service` usando a imagem Go 1.21;
+- os três testes unitários de configuração passaram no `flag-service`;
+- os três testes unitários de configuração passaram no `targeting-service`;
+- `terraform validate` e a renderização Kustomize confirmaram o contrato dos nomes usados pelo futuro deploy;
+- as cinco imagens locais foram reconstruídas e os nove contêineres ficaram saudáveis;
+- o smoke auth/flag/targeting/evaluation passou com status `200` e `result: true`;
+- nenhum apply, push de imagem ou alteração cloud foi executado.

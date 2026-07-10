@@ -1,23 +1,23 @@
-# Documentation
+# Documentação
 
-This folder contains material for the final review.
+Material em português para revisão e entrega:
 
-Recommended files:
+- `report.html`: fonte canônica do PDF final;
+- `delivery-report.md`: identificação e links em formato texto;
+- `architecture.md`: explicação fiel ao diagrama e à implementação;
+- `fixes.md`: somente mudanças necessárias nos microsserviços;
+- `local-development.md`: Compose e smoke local;
+- `video-runbook.md`: provisionamento autorizado, roteiro de até 20 minutos, evidências, PDF e destroy.
 
-- `report.html` - canonical source for the final PDF report.
-- `architecture.md`
-- `fixes.md`
-- `delivery-report.md`
+Saída gerada:
 
-Generated report output:
+- `dist/delivery-report.pdf` é gerado de `docs/report.html` e ignorado pelo Git;
+- execute `npm install`, `npm run report:install` e `npm run report:pdf` na raiz;
+- `report:pdf` regenera os diagramas antes do PDF;
+- não entregue um PDF que ainda contenha `PENDENTE`.
 
-- `dist/delivery-report.pdf` is generated from `docs/report.html`.
-- The generated PDF is ignored by Git through the existing `dist/` rule.
-- Run `npm install`, `npm run report:install`, and `npm run report:pdf` from the repository root.
-- `npm run report:pdf` regenerates diagram exports from draw.io before creating the PDF.
+Diagramas:
 
-Diagrams:
-
-- Keep draw.io source files and exported report images in `docs/diagrams/`.
-- Treat `docs/diagrams/overall-architecture.drawio` as the source of truth.
-- Do not hand-edit exported SVG/PNG files; run `npm run diagrams:export`.
+- mantenha o `.drawio` como fonte de verdade;
+- não edite PNG/SVG manualmente; execute `npm run diagrams:export`;
+- o diagrama deve refletir o que foi realmente implantado e demonstrado.

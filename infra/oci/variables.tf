@@ -178,12 +178,6 @@ variable "availability_domain_name" {
   nullable    = true
 }
 
-variable "postgres_password_secret_id" {
-  description = "OCID of an existing OCI Vault secret containing the PostgreSQL administrator password."
-  type        = string
-  sensitive   = true
-}
-
 variable "postgres_admin_username" {
   description = "Administrator username shared by the three independent PostgreSQL systems."
   type        = string
@@ -322,9 +316,21 @@ variable "kubernetes_namespace" {
 }
 
 variable "create_workload_identity_policy" {
-  description = "Create least-privilege policies for evaluation and analytics Kubernetes service accounts."
+  description = "Create least-privilege policies for Queue, NoSQL, and the OCI Vault CSI provider workloads."
   type        = bool
   default     = true
+}
+
+variable "secrets_provider_namespace" {
+  description = "Namespace used by the OCI Vault Secrets Store CSI provider."
+  type        = string
+  default     = "kube-system"
+}
+
+variable "secrets_provider_service_account" {
+  description = "Service account created by the OCI Vault Secrets Store CSI provider Helm chart."
+  type        = string
+  default     = "oci-secrets-store-csi-driver-provider-sa"
 }
 
 variable "freeform_tags" {

@@ -12,8 +12,8 @@ import (
 
 // App struct (para injeção de dependência)
 type App struct {
-	DB         *sql.DB
-	MasterKey  string
+	DB        *sql.DB
+	MasterKey string
 }
 
 func main() {
@@ -26,9 +26,9 @@ func main() {
 		port = "8001" // Porta padrão
 	}
 
-	databaseURL := os.Getenv("DATABASE_URL")
-	if databaseURL == "" {
-		log.Fatal("DATABASE_URL deve ser definida")
+	databaseURL, err := databaseDSN()
+	if err != nil {
+		log.Fatalf("Configuração do PostgreSQL inválida: %v", err)
 	}
 
 	masterKey := os.Getenv("MASTER_KEY")
@@ -48,8 +48,8 @@ func main() {
 	}
 
 	app := &App{
-		DB:         db,
-		MasterKey:  masterKey,
+		DB:        db,
+		MasterKey: masterKey,
 	}
 
 	// --- Rotas da API ---

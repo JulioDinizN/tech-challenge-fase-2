@@ -20,9 +20,6 @@ node_image_id       = "ocid1.image.oc1.sa-saopaulo-1.replace-me"
 node_shape          = "VM.Standard.E5.Flex"
 oke_cluster_type    = "ENHANCED_CLUSTER"
 
-# This secret must already exist. The password value is never stored in this file.
-postgres_password_secret_id = "ocid1.vaultsecret.oc1.sa-saopaulo-1.replace-me"
-
 # Development-sized defaults are intentionally explicit for cost review.
 node_pool_size             = 2
 node_ocpus                 = 1

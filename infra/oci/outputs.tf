@@ -9,6 +9,17 @@ output "oke_cluster" {
   }
 }
 
+output "deployment_context" {
+  description = "Non-secret OCI values consumed by the Kubernetes rendering and add-on scripts."
+  value = {
+    region                  = var.region
+    compartment_id          = var.compartment_id
+    kubernetes_namespace    = var.kubernetes_namespace
+    postgres_admin_username = var.postgres_admin_username
+    oci_config_profile      = var.oci_config_profile
+  }
+}
+
 output "kubeconfig_command" {
   description = "Command to run manually after provisioning to create a local kubeconfig."
   value       = "oci ce cluster create-kubeconfig --cluster-id ${oci_containerengine_cluster.main.id} --file $HOME/.kube/config --region ${var.region} --token-version 2.0.0 --profile ${var.oci_config_profile}"
@@ -25,7 +36,7 @@ output "ocir_repositories" {
 }
 
 output "postgresql_systems" {
-  description = "Private PostgreSQL endpoints and database names. Passwords remain in OCI Vault."
+  description = "Private PostgreSQL endpoints and database names. Password values remain in OCI Vault."
   value = {
     for service, database in oci_psql_db_system.services : service => {
       id            = database.id
@@ -33,6 +44,24 @@ output "postgresql_systems" {
       private_ip    = database.network_details[0].primary_db_endpoint_private_ip
       port          = 5432
       username      = var.postgres_admin_username
+    }
+  }
+}
+
+output "vault" {
+  description = "OCI Vault metadata and generated secret names used by the Kubernetes CSI overlay. No secret values are exported."
+  value = {
+    id     = oci_kms_vault.application.id
+    key_id = oci_kms_key.application.id
+    secret_names = {
+      postgres_admin_passwords = {
+        for service, secret in oci_vault_secret.postgres_admin_password : service => secret.secret_name
+      }
+      postgres_app_passwords = {
+        for service, secret in oci_vault_secret.postgres_app_password : service => secret.secret_name
+      }
+      auth_master_key  = oci_vault_secret.auth_master_key.secret_name
+      internal_api_key = oci_vault_secret.internal_api_key.secret_name
     }
   }
 }

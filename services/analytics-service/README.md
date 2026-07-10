@@ -50,6 +50,8 @@ Modos alternativos:
 
 Os valores devem vir dos outputs Terraform `evaluation_queue` e `analytics_table`. Com workload identity, não há chave OCI estática no pod.
 
+O serviço não possui segredo próprio da aplicação. A ServiceAccount `analytics-service` recebe somente as permissões OCI de consumo da fila e acesso às linhas NoSQL por Workload Identity.
+
 ## Persistência e reentrega
 
 O ID da mensagem OCI é usado como `event_id`, tornando uma reentrega idempotente para a chave primária da tabela. A linha possui:

@@ -30,6 +30,7 @@
 
       h1,
       h2,
+      h3,
       p {
         margin-top: 0;
       }
@@ -49,8 +50,24 @@
         font-size: 15pt;
       }
 
+      h3 {
+        margin: 4mm 0 2mm;
+        color: #1e293b;
+        font-size: 12pt;
+      }
+
       p {
         margin-bottom: 2.5mm;
+      }
+
+      ul,
+      ol {
+        margin: 0 0 3mm;
+        padding-left: 6mm;
+      }
+
+      li {
+        margin-bottom: 1.2mm;
       }
 
       a {
@@ -104,6 +121,25 @@
       .pending {
         color: #92400e;
         font-weight: 700;
+      }
+
+      .status {
+        display: inline-block;
+        padding: 0.5mm 1.5mm;
+        border-radius: 999px;
+        background: #dcfce7;
+        color: #166534;
+        font-size: 9pt;
+        font-weight: 700;
+      }
+
+      .status.waiting {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      .page-break {
+        break-before: page;
       }
 
       .diagram {
@@ -199,9 +235,9 @@
         </table>
       </section>
 
-      <section>
+      <section class="page-break">
         <h2>Arquitetura</h2>
-        <p>Diagrama geral da solução com microsserviços, Kubernetes, Ingress e serviços de dados.</p>
+        <p>Arquitetura implementada para a opção Oracle Cloud Infrastructure, incluindo entrada pública temporária por HTTP, OKE, cinco microsserviços, persistência, mensageria, segredos e autoscaling.</p>
         <figure class="diagram">
           <img
             src="diagrams/overall-architecture.png"
@@ -209,10 +245,92 @@
             data-fallback="architecture-placeholder"
           />
           <div class="diagram-placeholder" id="architecture-placeholder">
-            <strong>PENDENTE:</strong> exportar o diagrama do draw.io para
+            Não foi possível carregar a exportação do diagrama em
             <code>docs/diagrams/overall-architecture.png</code>.
           </div>
         </figure>
+      </section>
+
+      <section class="page-break">
+        <h2>Resumo da Solução</h2>
+        <table>
+          <tbody>
+            <tr><th>Ambiente local</th><td>Cinco aplicações, dois PostgreSQL, Redis e DynamoDB Local: nove contêineres.</td></tr>
+            <tr><th>Cluster e imagens</th><td>Oracle Kubernetes Engine (OKE) e cinco repositórios privados no OCIR.</td></tr>
+            <tr><th>Dados</th><td>Três OCI Database with PostgreSQL independentes, OCI Cache, OCI Queue e OCI NoSQL.</td></tr>
+            <tr><th>Entrada</th><td>OCI Load Balancer e F5 NGINX Ingress Controller OSS para <code>/validate</code>, <code>/flags</code>, <code>/rules</code> e <code>/evaluate</code>.</td></tr>
+            <tr><th>Escalabilidade</th><td>Metrics Server e HPAs de CPU para evaluation e analytics, de 1 a 5 réplicas.</td></tr>
+            <tr><th>Segurança</th><td>OCI Vault, Secrets Store CSI, Secrets Kubernetes, usuários de banco restritos e OKE Workload Identity.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Fluxos Principais</h2>
+        <h3>Avaliação</h3>
+        <ol>
+          <li>O cliente chama <code>/evaluate</code> pelo Load Balancer e NGINX Ingress.</li>
+          <li>O evaluation-service consulta Redis e, quando necessário, flag-service e targeting-service.</li>
+          <li>A decisão retorna ao cliente e o evento é publicado de forma assíncrona na OCI Queue.</li>
+        </ol>
+        <h3>Analytics</h3>
+        <ol>
+          <li>O analytics-service faz long polling na OCI Queue.</li>
+          <li>O evento é validado e persistido na tabela <code>ToggleMasterAnalytics</code>.</li>
+          <li>A mensagem só é confirmada depois da escrita. O ID da mensagem é usado como chave para permitir reentrega idempotente.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>Segredos e Bancos</h2>
+        <p>O Terraform cria um Vault <code>DEFAULT</code>, uma chave AES-256 de software e oito segredos cujo conteúdo é gerado no próprio OCI. Terraform exporta apenas nomes, OCIDs e endpoints, nunca senhas.</p>
+        <p>O provider CSI usa Workload Identity para sincronizar senhas e chaves em Secrets nativos do Kubernetes. Três Jobs idempotentes criam cada banco, o usuário restrito da aplicação e o schema. Os pods não recebem a senha administrativa.</p>
+        <p>Localmente, <code>DATABASE_URL</code> continua com prioridade. No OKE, host, banco e usuário vêm de ConfigMap, enquanto somente <code>DB_PASSWORD</code> vem do Secret. Dessa forma, a adaptação OCI não impede o uso do Docker Compose.</p>
+      </section>
+
+      <section>
+        <h2>Atendimento aos Requisitos</h2>
+        <table>
+          <tbody>
+            <tr><th>Docker Compose com 9 contêineres</th><td><span class="status">Implementado e validado</span></td></tr>
+            <tr><th>Dockerfiles dos 5 serviços</th><td><span class="status">Implementado</span></td></tr>
+            <tr><th>Terraform OCI reproduzível</th><td><span class="status">Validado: 53 creates, 0 changes, 0 destroys</span></td></tr>
+            <tr><th>Namespace, Deployments e Services</th><td><span class="status">Implementado e renderizado</span></td></tr>
+            <tr><th>ConfigMaps, Secrets, probes e limites</th><td><span class="status">Implementado e renderizado</span></td></tr>
+            <tr><th>Ingress NGINX e Load Balancer</th><td><span class="status waiting">Evidência cloud na gravação</span></td></tr>
+            <tr><th>HPA de evaluation e analytics</th><td><span class="status waiting">Evidência de escala na gravação</span></td></tr>
+            <tr><th>Queue para NoSQL</th><td><span class="status waiting">Evidência de persistência na gravação</span></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Adaptações dos Microsserviços</h2>
+        <ul>
+          <li>Correções de build, dependências e Dockerfiles para executar os cinco serviços em contêineres.</li>
+          <li>Chave interna inicial criada de forma idempotente no auth-service para integrar evaluation, flag e targeting.</li>
+          <li>Producer OCI Queue no evaluation-service e consumer OCI Queue/NoSQL no analytics-service, ambos com Workload Identity.</li>
+          <li>Configuração PostgreSQL por <code>DB_*</code> para receber senha do Vault sem remover a compatibilidade com <code>DATABASE_URL</code>.</li>
+          <li>Fallbacks locais: avaliação apenas registra analytics no log e o worker de analytics permanece desligado.</li>
+        </ul>
+        <p>Detalhes, causas, decisões e verificações estão em <code>docs/fixes.md</code>.</p>
+      </section>
+
+      <section>
+        <h2>Desafios e Decisões</h2>
+        <ul>
+          <li>Mapear SQS/DynamoDB para APIs nativas OCI sem alterar o contrato do evento.</li>
+          <li>Evitar senha em Terraform e manifests usando geração no Vault e sincronização CSI.</li>
+          <li>Inicializar bancos gerenciados com usuários restritos e Jobs idempotentes.</li>
+          <li>Manter a topologia local exigida mesmo com integrações OCI desabilitadas no Compose.</li>
+          <li>Planejar teardown na ordem correta, pois o Load Balancer criado pelo controller Kubernetes não pertence ao state Terraform.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Validação e Evidências</h2>
+        <p>Antes do deploy foram executados testes unitários, build das cinco imagens locais, nove contêineres saudáveis, smoke completo com <code>result: true</code>, Terraform validate/plan com 53 criações e renderização dos 21 recursos da base e 32 do overlay OCI. O roteiro <code>docs/video-runbook.md</code> define smoke cloud, carga, evidências, PDF e destruição.</p>
+        <p><strong>Importante:</strong> a versão final deste relatório só deve substituir o estado de preparação por evidência observada depois da implantação autorizada e da gravação.</p>
       </section>
 
       <section>
@@ -229,7 +347,7 @@
 
       <p class="note">
         Este relatório contém os itens solicitados na seção "Relatório de Entrega (.PDF ou .txt)"
-        do documento do Tech Challenge Fase 2 e inclui também o diagrama de arquitetura para facilitar a revisão.
+        do Tech Challenge Fase 2 e inclui também arquitetura, decisões e rastreabilidade da implementação.
       </p>
     </main>
     <script>
