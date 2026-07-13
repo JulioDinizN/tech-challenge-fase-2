@@ -1,6 +1,6 @@
 # POSTECH Tech Challenge - Fase 2
 
-Repositório de entrega do ToggleMaster, Grupo 191. O projeto reúne os cinco microsserviços, o ambiente local exigido com nove contêineres e a infraestrutura reproduzível para Oracle Cloud Infrastructure (OCI).
+Repositório de entrega do ToggleMaster, Grupo 76. O projeto reúne os cinco microsserviços, o ambiente local exigido com nove contêineres e a infraestrutura reproduzível para Oracle Cloud Infrastructure (OCI).
 
 ## Estado da entrega
 

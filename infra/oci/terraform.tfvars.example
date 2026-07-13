@@ -32,5 +32,5 @@ redis_node_memory_in_gbs   = 2
 
 freeform_tags = {
   Environment = "development"
-  Owner       = "grupo-191"
+  Owner       = "grupo-76"
 }
