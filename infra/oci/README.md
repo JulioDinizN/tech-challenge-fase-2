@@ -136,7 +136,7 @@ Depois do apply autorizado:
 1. execute `terraform output -raw kubeconfig_command` e rode o comando exibido;
 2. defina `IMAGE_TAG`, `OCIR_USERNAME` e `OCIR_AUTH_TOKEN` somente no shell;
 3. use `scripts/build-push-images.sh` e `scripts/deploy-oke.sh`;
-4. grave smoke, HPA e persistência conforme `docs/video-runbook.md`;
+4. execute `scripts/smoke-oke.sh` e `scripts/load-test-oke.sh` e registre no vídeo o Ingress, os HPAs e a persistência;
 5. execute `scripts/destroy-oci.sh` ao finalizar.
 
 O output `vault` contém somente o OCID do Vault e os nomes dos segredos; `deployment_context`, `network`, `postgresql_systems`, `redis`, `evaluation_queue`, `analytics_table` e `ocir_repositories` alimentam a renderização. Terraform não altera o kubeconfig nem lê o conteúdo dos segredos.

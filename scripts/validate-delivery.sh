@@ -38,7 +38,7 @@ docker compose run --rm --no-deps \
   -e ANALYTICS_WORKER_ENABLED=false \
   analytics-service python -m unittest -v
 
-if [[ "${FINAL_DELIVERY:-0}" == "1" ]] && rg -n 'PENDENTE|replace-me|replace-with' docs/delivery-report.md docs/report.html; then
+if [[ "${FINAL_DELIVERY:-0}" == "1" ]] && rg -n 'PENDENTE|replace-me|replace-with' docs/report.html; then
   echo "Final delivery still contains placeholders." >&2
   exit 1
 fi

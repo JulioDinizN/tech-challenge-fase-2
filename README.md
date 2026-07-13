@@ -25,9 +25,8 @@ Nenhum recurso cloud foi criado por este repositório até o momento. `terraform
 |-- docker-compose.yml        # Ambiente local de nove contêineres
 |-- k8s/                      # Base Kubernetes e overlay OCI/OKE
 |-- infra/oci/                # Infraestrutura OCI em Terraform
-|-- scripts/                  # Validação, deploy, testes, evidências e teardown
-|-- docs/                     # Arquitetura, correções, roteiro e relatório
-`-- evidence/                 # Somente evidências revisadas e sanitizadas
+|-- scripts/                  # Validação, deploy, testes e teardown
+`-- docs/                     # Arquitetura, correções e relatório
 ```
 
 ## Fluxo de execução
@@ -40,8 +39,6 @@ Nenhum recurso cloud foi criado por este repositório até o momento. `terraform
 6. Executar smoke test, carga, evidências e gravar o vídeo de até 20 minutos.
 7. Inserir o link do vídeo em `docs/report.html`, gerar o PDF final e revisar placeholders.
 8. Remover primeiro os recursos Kubernetes/LB e depois executar o `terraform destroy` pelo script documentado.
-
-O roteiro operacional completo está em `docs/video-runbook.md`.
 
 ## Execução local
 

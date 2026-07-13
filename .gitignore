@@ -22,7 +22,6 @@ bin/
 dist/
 build/
 coverage/
-evidence/runtime/
 
 # Dependency folders
 node_modules/

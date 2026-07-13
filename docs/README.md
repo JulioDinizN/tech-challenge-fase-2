@@ -3,11 +3,9 @@
 Material em português para revisão e entrega:
 
 - `report.html`: fonte canônica do PDF final;
-- `delivery-report.md`: identificação e links em formato texto;
 - `architecture.md`: explicação fiel ao diagrama e à implementação;
 - `fixes.md`: somente mudanças necessárias nos microsserviços;
-- `local-development.md`: Compose e smoke local;
-- `video-runbook.md`: provisionamento autorizado, roteiro de até 20 minutos, evidências, PDF e destroy.
+- `local-development.md`: Compose e smoke local.
 
 Saída gerada:
 

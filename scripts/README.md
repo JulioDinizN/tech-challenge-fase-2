@@ -12,7 +12,6 @@ Automação reproduzível da validação e da janela de demonstração. Scripts 
 | `deploy-oke.sh` | Pull Secret, manifests, Jobs e espera dos rollouts | Sim, OKE |
 | `smoke-oke.sh` | Fluxo auth/flag/rule/evaluate via Ingress | Sim, dados da aplicação |
 | `load-test-oke.sh` | Carga para HPA e Queue | Sim, tráfego/dados |
-| `capture-evidence.sh` | Coleta estado Kubernetes sem ler Secrets | Somente leitura |
 | `destroy-oci.sh` | Remove workloads/LB, add-ons e executa destroy | Sim, destrutivo |
 
 ## Credenciais efêmeras
@@ -36,10 +35,9 @@ O token cria `ocir-pull-secret` diretamente no cluster porque o kubelet precisa 
 ./scripts/deploy-oke.sh
 ./scripts/smoke-oke.sh
 ./scripts/load-test-oke.sh
-./scripts/capture-evidence.sh
 ```
 
-Use `docs/video-runbook.md` durante a gravação. Para encerrar custos, execute o teardown somente após confirmar a evidência:
+Para encerrar custos, execute o teardown somente após confirmar a gravação e os resultados necessários para o relatório:
 
 ```bash
 CONFIRM_DESTROY=togglemaster ./scripts/destroy-oci.sh
