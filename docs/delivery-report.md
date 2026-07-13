@@ -27,7 +27,7 @@ Saída gerada: `dist/delivery-report.pdf`.
 ## Arquitetura
 
 - Diagrama geral: `docs/diagrams/overall-architecture.png`
-- Status: `docs/diagrams/overall-architecture.drawio` é a fonte de verdade; PNG/SVG são exportações geradas.
+- Status: `docs/diagrams/overall-architecture.drawio` é a fonte de verdade; o PNG é a exportação gerada para o relatório.
 
 ## Resumo da solução
 

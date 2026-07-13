@@ -5,10 +5,9 @@ Visão de contêiner e implantação do ToggleMaster para a entrega final na Ora
 ## Diagrama
 
 - Fonte editável: `docs/diagrams/overall-architecture.drawio`
-- Exportação SVG: `docs/diagrams/overall-architecture.svg`
 - Exportação PNG usada no relatório: `docs/diagrams/overall-architecture.png`
 
-O arquivo `.drawio` é a fonte de verdade. As exportações devem ser regeneradas com `npm run diagrams:export`; os arquivos PNG e SVG não devem ser editados manualmente.
+O arquivo `.drawio` é a fonte de verdade. O PNG deve ser regenerado com `npm run diagrams:export` e não deve ser editado manualmente.
 
 ## Entrada e execução
 

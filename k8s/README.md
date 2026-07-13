@@ -14,6 +14,12 @@ Manifests da entrega Kubernetes do ToggleMaster.
 - HPAs `autoscaling/v2` para avaliação e analytics;
 - overlay OCI com imagens OCIR, outputs Terraform, OCI Vault CSI e três Jobs de schema.
 
+## Organização
+
+`base/` é independente de provedor e renderiza sem cluster. Ele mantém imagens e endpoints de substituição e referencia Secrets que somente o ambiente fornece. Os arquivos `base/secrets/*.example.yaml` usam valores fictícios, ficam fora do `kustomization.yaml` e nunca devem ser aplicados.
+
+`overlays/oci/` fornece imagens, endpoints, integração OCI Vault CSI e os Jobs de inicialização necessários ao OKE. Os SQLs em `overlays/oci/database/` espelham os schemas dos microsserviços; qualquer mudança de schema deve ser sincronizada e validada nos dois locais.
+
 ## Renderização segura
 
 Sem acesso ao cluster:

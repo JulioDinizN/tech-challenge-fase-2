@@ -21,14 +21,9 @@ const diagrams = [
     source: path.join(repoRoot, "docs", "diagrams", "overall-architecture.drawio"),
     exports: [
       {
-        format: "svg",
-        output: path.join(repoRoot, "docs", "diagrams", "overall-architecture.svg"),
-        args: ["-x", "-f", "svg", "-e", "-b", "10"]
-      },
-      {
         format: "png",
         output: path.join(repoRoot, "docs", "diagrams", "overall-architecture.png"),
-        args: ["-x", "-f", "png", "-e", "-b", "10", "-s", "2"]
+        args: ["-x", "-f", "png", "-b", "10", "-s", "2"]
       }
     ]
   }

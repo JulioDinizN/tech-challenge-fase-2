@@ -18,6 +18,8 @@ Saída gerada:
 
 Diagramas:
 
-- mantenha o `.drawio` como fonte de verdade;
-- não edite PNG/SVG manualmente; execute `npm run diagrams:export`;
+- `diagrams/overall-architecture.drawio` é a fonte editável de verdade;
+- `diagrams/overall-architecture.png` é a única exportação versionada e usada pelo relatório;
+- não edite o PNG manualmente; execute `npm run diagrams:export`;
+- o script usa o CLI do draw.io Desktop, procura por padrão em `/Applications/draw.io.app/Contents/MacOS/draw.io` no macOS e aceita `DRAWIO_BIN` para outro caminho;
 - o diagrama deve refletir o que foi realmente implantado e demonstrado.
