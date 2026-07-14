@@ -142,6 +142,17 @@ variable "node_pool_name" {
   }
 }
 
+variable "node_availability_domain_count" {
+  description = "Optional number of availability domains offered to OKE for worker placement."
+  type        = number
+  default     = null
+
+  validation {
+    condition     = var.node_availability_domain_count == null || var.node_availability_domain_count >= 1
+    error_message = "node_availability_domain_count must be null or at least 1."
+  }
+}
+
 variable "node_ocpus" {
   description = "OCPUs allocated to each flexible OKE worker node."
   type        = number

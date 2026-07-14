@@ -58,7 +58,14 @@ resource "oci_containerengine_node_pool" "main" {
     size                                = var.node_pool_size
 
     dynamic "placement_configs" {
-      for_each = data.oci_identity_availability_domains.available.availability_domains
+      for_each = slice(
+        data.oci_identity_availability_domains.available.availability_domains,
+        0,
+        coalesce(
+          var.node_availability_domain_count,
+          length(data.oci_identity_availability_domains.available.availability_domains),
+        ),
+      )
 
       content {
         availability_domain = placement_configs.value.name
@@ -103,6 +110,14 @@ resource "oci_containerengine_node_pool" "main" {
         var.node_image_id,
       )
       error_message = "node_image_id is not an OKE image compatible with kubernetes_version."
+    }
+
+    precondition {
+      condition = (
+        var.node_availability_domain_count == null ||
+        var.node_availability_domain_count <= length(data.oci_identity_availability_domains.available.availability_domains)
+      )
+      error_message = "node_availability_domain_count exceeds the availability domains in the selected region."
     }
   }
 }
