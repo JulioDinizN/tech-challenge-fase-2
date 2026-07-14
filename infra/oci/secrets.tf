@@ -33,7 +33,6 @@ resource "oci_vault_secret" "postgres_admin_password" {
     generation_type     = "PASSPHRASE"
     generation_template = "DBAAS_DEFAULT_PASSWORD"
     passphrase_length   = 30
-    secret_template     = "%GENERATED_PASSPHRASE%"
   }
 }
 
@@ -52,7 +51,6 @@ resource "oci_vault_secret" "postgres_app_password" {
     generation_type     = "PASSPHRASE"
     generation_template = "SECRETS_DEFAULT_PASSWORD"
     passphrase_length   = 32
-    secret_template     = "%GENERATED_PASSPHRASE%"
   }
 }
 
@@ -69,7 +67,6 @@ resource "oci_vault_secret" "auth_master_key" {
     generation_type     = "PASSPHRASE"
     generation_template = "SECRETS_DEFAULT_PASSWORD"
     passphrase_length   = 32
-    secret_template     = "tm_master_%GENERATED_PASSPHRASE%"
   }
 }
 
@@ -86,6 +83,5 @@ resource "oci_vault_secret" "internal_api_key" {
     generation_type     = "PASSPHRASE"
     generation_template = "SECRETS_DEFAULT_PASSWORD"
     passphrase_length   = 32
-    secret_template     = "tm_service_%GENERATED_PASSPHRASE%"
   }
 }

@@ -34,11 +34,12 @@ Essas tarefas estão em `k8s/` e `scripts/`. Separar a infraestrutura do deploy 
 ## Architecture decisions
 
 - The OKE API endpoint is public but restricted to `api_allowed_cidrs`; worker and data resources have no public IPs.
+- Uma security list vazia explícita evita herdar regras da VCN; os NSGs versionados permitem os fluxos exigidos pelo OKE entre workers e o endpoint Kubernetes (`6443`, `12250` e retorno do control plane), além de `10256` entre o Load Balancer e o `kube-proxy`.
 - OKE uses the Flannel overlay CNI to keep the initial student deployment small and straightforward.
 - The default is an Enhanced OKE cluster because OCI workload identity and node cycling are enhanced-cluster features. A Basic cluster is possible only when `create_workload_identity_policy = false`; the applications would then need a different authentication design, such as instance principals.
 - O F5 NGINX Ingress Controller OSS cria dinamicamente um Load Balancer flexível de 10 Mbps na subnet pública e usa os NSGs expostos no output `network`. Esse Load Balancer não pertence ao state do Terraform; o teardown o remove e espera sua exclusão antes do `terraform destroy`.
 - O Terraform cria um Vault do tipo `DEFAULT` e uma chave `SOFTWARE`, opções dentro do Always Free, em vez de um Virtual Private Vault pago.
-- O OCI Vault gera três senhas administrativas de PostgreSQL, três senhas de aplicação, uma `MASTER_KEY` e uma chave interna. O conteúdo não é informado ao Terraform, não aparece em `.tfvars` e não é exportado; somente nomes, OCIDs e regras de geração fazem parte do plano/state.
+- O OCI Vault gera três senhas administrativas de PostgreSQL, três senhas de aplicação, uma `MASTER_KEY` e uma chave interna usando o formato padrão de passphrase do serviço. O conteúdo não é informado ao Terraform, não aparece em `.tfvars` e não é exportado; somente nomes, OCIDs e regras de geração fazem parte do plano/state.
 - Cada PostgreSQL recebe seu próprio segredo administrativo e versão atual. No cluster, Jobs criam usuários de aplicação restritos; os Deployments não recebem a senha administrativa.
 - OCI Cache is private and TLS-only. The future application value should use the output `redis.tls_url` (`rediss://`).
 - The default one-node Redis cluster is a cost-conscious development setting, not a high-availability topology. OCI recommends at least three nodes for reliability; set `redis_node_count = 3` before a production-style deployment if the budget permits.

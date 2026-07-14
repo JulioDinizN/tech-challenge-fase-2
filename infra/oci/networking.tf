@@ -6,6 +6,13 @@ resource "oci_core_vcn" "main" {
   freeform_tags  = local.common_tags
 }
 
+resource "oci_core_security_list" "empty" {
+  compartment_id = var.compartment_id
+  vcn_id         = oci_core_vcn.main.id
+  display_name   = "${var.project_name}-nsg-only"
+  freeform_tags  = local.common_tags
+}
+
 resource "oci_core_internet_gateway" "main" {
   compartment_id = var.compartment_id
   vcn_id         = oci_core_vcn.main.id
@@ -72,7 +79,7 @@ resource "oci_core_subnet" "api" {
   dns_label                  = "tmapi"
   prohibit_public_ip_on_vnic = false
   route_table_id             = oci_core_route_table.public.id
-  security_list_ids          = []
+  security_list_ids          = [oci_core_security_list.empty.id]
   freeform_tags              = local.common_tags
 }
 
@@ -84,7 +91,7 @@ resource "oci_core_subnet" "load_balancer" {
   dns_label                  = "tmlb"
   prohibit_public_ip_on_vnic = false
   route_table_id             = oci_core_route_table.public.id
-  security_list_ids          = []
+  security_list_ids          = [oci_core_security_list.empty.id]
   freeform_tags              = local.common_tags
 }
 
@@ -96,7 +103,7 @@ resource "oci_core_subnet" "workers" {
   dns_label                  = "tmworkers"
   prohibit_public_ip_on_vnic = true
   route_table_id             = oci_core_route_table.private.id
-  security_list_ids          = []
+  security_list_ids          = [oci_core_security_list.empty.id]
   freeform_tags              = local.common_tags
 }
 
@@ -108,7 +115,7 @@ resource "oci_core_subnet" "data" {
   dns_label                  = "tmdata"
   prohibit_public_ip_on_vnic = true
   route_table_id             = oci_core_route_table.private.id
-  security_list_ids          = []
+  security_list_ids          = [oci_core_security_list.empty.id]
   freeform_tags              = local.common_tags
 }
 
@@ -190,6 +197,22 @@ resource "oci_core_network_security_group_security_rule" "api_from_workers" {
   }
 }
 
+resource "oci_core_network_security_group_security_rule" "api_kubernetes_from_workers" {
+  network_security_group_id = oci_core_network_security_group.api.id
+  direction                 = "INGRESS"
+  protocol                  = "6"
+  source                    = oci_core_network_security_group.workers.id
+  source_type               = "NETWORK_SECURITY_GROUP"
+  stateless                 = false
+
+  tcp_options {
+    destination_port_range {
+      min = 6443
+      max = 6443
+    }
+  }
+}
+
 resource "oci_core_network_security_group_security_rule" "api_icmp_from_workers" {
   network_security_group_id = oci_core_network_security_group.api.id
   direction                 = "INGRESS"
@@ -211,13 +234,6 @@ resource "oci_core_network_security_group_security_rule" "workers_from_api" {
   source                    = oci_core_network_security_group.api.id
   source_type               = "NETWORK_SECURITY_GROUP"
   stateless                 = false
-
-  tcp_options {
-    destination_port_range {
-      min = 10250
-      max = 10250
-    }
-  }
 }
 
 resource "oci_core_network_security_group_security_rule" "workers_icmp_from_api" {
@@ -255,6 +271,22 @@ resource "oci_core_network_security_group_security_rule" "workers_from_load_bala
     destination_port_range {
       min = 30000
       max = 32767
+    }
+  }
+}
+
+resource "oci_core_network_security_group_security_rule" "workers_kube_proxy_from_load_balancer" {
+  network_security_group_id = oci_core_network_security_group.workers.id
+  direction                 = "INGRESS"
+  protocol                  = "6"
+  source                    = var.network_cidrs.load_balancer
+  source_type               = "CIDR_BLOCK"
+  stateless                 = false
+
+  tcp_options {
+    destination_port_range {
+      min = 10256
+      max = 10256
     }
   }
 }
