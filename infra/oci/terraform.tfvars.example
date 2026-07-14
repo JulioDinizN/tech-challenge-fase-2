@@ -27,6 +27,11 @@ node_memory_in_gbs         = 8
 postgres_instance_count    = 1
 postgres_ocpus             = 1
 postgres_memory_in_gbs     = 16
+postgres_shapes = {
+  auth-service      = "PostgreSQL.VM.Standard.E5.Flex"
+  flag-service      = "PostgreSQL.VM.Standard.E6.Flex"
+  targeting-service = "PostgreSQL.VM.Standard3.Flex"
+}
 redis_node_count           = 1
 redis_node_memory_in_gbs   = 2
 

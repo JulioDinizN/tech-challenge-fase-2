@@ -190,10 +190,28 @@ variable "postgres_db_version" {
   default     = "14"
 }
 
-variable "postgres_shape" {
-  description = "OCI Database with PostgreSQL flexible shape."
-  type        = string
-  default     = "PostgreSQL.VM.Standard.E5.Flex"
+variable "postgres_shapes" {
+  description = "OCI Database with PostgreSQL flexible shape selected independently for each service."
+  type        = map(string)
+  default = {
+    auth-service      = "PostgreSQL.VM.Standard.E5.Flex"
+    flag-service      = "PostgreSQL.VM.Standard.E6.Flex"
+    targeting-service = "PostgreSQL.VM.Standard3.Flex"
+  }
+
+  validation {
+    condition = (
+      length(var.postgres_shapes) == 3 &&
+      alltrue([
+        for service in ["auth-service", "flag-service", "targeting-service"] :
+        contains(keys(var.postgres_shapes), service)
+      ]) &&
+      alltrue([
+        for shape in values(var.postgres_shapes) : startswith(shape, "PostgreSQL.VM.")
+      ])
+    )
+    error_message = "postgres_shapes must define a PostgreSQL.VM shape for auth-service, flag-service, and targeting-service."
+  }
 }
 
 variable "postgres_instance_count" {

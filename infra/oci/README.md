@@ -43,6 +43,7 @@ Essas tarefas estão em `k8s/` e `scripts/`. Separar a infraestrutura do deploy 
 - OCI Cache is private and TLS-only. The future application value should use the output `redis.tls_url` (`rediss://`).
 - The default one-node Redis cluster is a cost-conscious development setting, not a high-availability topology. OCI recommends at least three nodes for reliability; set `redis_node_count = 3` before a production-style deployment if the budget permits.
 - Queue producer and consumer access is separated with `queue-push` and `queue-pull`; analytics receives row-level NoSQL access. Uma policy separada na mesma resource autoriza somente a ServiceAccount do provider CSI, em `kube-system`, a usar segredos do Vault criado pelo stack.
+- Os três PostgreSQL mantêm a mesma capacidade de desenvolvimento (uma instância, 1 OCPU e 16 GB), mas usam famílias E5, E6 e Standard3 independentes por padrão. Isso preserva o isolamento exigido e respeita o limite de um DB System por família disponível na tenancy estudantil; `postgres_shapes` continua configurável para outras regiões ou quotas.
 - PostgreSQL, Redis, and OKE sizes are variables because service availability, quotas, and cost differ by tenancy and region.
 
 ## Prerequisites for a future plan
