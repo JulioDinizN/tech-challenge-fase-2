@@ -16,7 +16,7 @@ resource "oci_psql_db_system" "services" {
   display_name                = "${var.project_name}-${each.key}-db"
   instance_count              = var.postgres_instance_count
   instance_memory_size_in_gbs = var.postgres_memory_in_gbs
-  instance_ocpu_count         = var.postgres_ocpus
+  instance_ocpu_count         = var.postgres_ocpus[each.key]
   shape                       = var.postgres_shapes[each.key]
   system_type                 = "OCI_OPTIMIZED_STORAGE"
   freeform_tags               = merge(local.common_tags, { DatabaseName = each.value })

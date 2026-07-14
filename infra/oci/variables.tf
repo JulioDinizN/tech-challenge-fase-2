@@ -226,13 +226,24 @@ variable "postgres_instance_count" {
 }
 
 variable "postgres_ocpus" {
-  description = "OCPUs allocated to each PostgreSQL instance."
-  type        = number
-  default     = 1
+  description = "OCPUs allocated independently to each PostgreSQL service instance."
+  type        = map(number)
+  default = {
+    auth-service      = 1
+    flag-service      = 1
+    targeting-service = 2
+  }
 
   validation {
-    condition     = var.postgres_ocpus >= 1
-    error_message = "postgres_ocpus must be at least 1."
+    condition = (
+      length(var.postgres_ocpus) == 3 &&
+      alltrue([
+        for service in ["auth-service", "flag-service", "targeting-service"] :
+        contains(keys(var.postgres_ocpus), service)
+      ]) &&
+      alltrue([for ocpus in values(var.postgres_ocpus) : ocpus >= 1])
+    )
+    error_message = "postgres_ocpus must define at least 1 OCPU for auth-service, flag-service, and targeting-service."
   }
 }
 
