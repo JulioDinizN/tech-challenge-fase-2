@@ -19,7 +19,8 @@ concurrency="${CONCURRENCY:-40}"
 flag_name="${FLAG_NAME:-enable-oke-demo}"
 ingress_host="${INGRESS_HOST:-togglemaster.local}"
 
-echo "In another terminal, record: kubectl -n togglemaster get hpa,pods -w"
+echo "In another terminal, record: kubectl -n togglemaster get hpa -w"
+echo "Optionally watch pods in a third terminal: kubectl -n togglemaster get pods -w"
 echo "Generating evaluation and OCI Queue load for $duration with concurrency $concurrency"
 url="$base_url/evaluate?user_id=load-test-user&flag_name=$flag_name"
 if command -v hey >/dev/null; then
