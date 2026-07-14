@@ -15,7 +15,7 @@ resource "oci_psql_db_system" "services" {
   db_version                  = var.postgres_db_version
   display_name                = "${var.project_name}-${each.key}-db"
   instance_count              = var.postgres_instance_count
-  instance_memory_size_in_gbs = var.postgres_memory_in_gbs
+  instance_memory_size_in_gbs = var.postgres_memory_in_gbs[each.key]
   instance_ocpu_count         = var.postgres_ocpus[each.key]
   shape                       = var.postgres_shapes[each.key]
   system_type                 = "OCI_OPTIMIZED_STORAGE"

@@ -53,7 +53,7 @@ resource "oci_containerengine_node_pool" "main" {
   }
 
   node_config_details {
-    is_pv_encryption_in_transit_enabled = true
+    is_pv_encryption_in_transit_enabled = false
     nsg_ids                             = [oci_core_network_security_group.workers.id]
     size                                = var.node_pool_size
 

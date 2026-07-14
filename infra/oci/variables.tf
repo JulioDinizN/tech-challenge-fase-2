@@ -248,13 +248,24 @@ variable "postgres_ocpus" {
 }
 
 variable "postgres_memory_in_gbs" {
-  description = "Memory allocated to each PostgreSQL instance."
-  type        = number
-  default     = 16
+  description = "Memory allocated independently to each PostgreSQL service instance."
+  type        = map(number)
+  default = {
+    auth-service      = 16
+    flag-service      = 16
+    targeting-service = 32
+  }
 
   validation {
-    condition     = var.postgres_memory_in_gbs >= 16
-    error_message = "The selected PostgreSQL flexible shape requires at least 16 GB."
+    condition = (
+      length(var.postgres_memory_in_gbs) == 3 &&
+      alltrue([
+        for service in ["auth-service", "flag-service", "targeting-service"] :
+        contains(keys(var.postgres_memory_in_gbs), service)
+      ]) &&
+      alltrue([for memory in values(var.postgres_memory_in_gbs) : memory >= 16])
+    )
+    error_message = "postgres_memory_in_gbs must define at least 16 GB for auth-service, flag-service, and targeting-service."
   }
 }
 
