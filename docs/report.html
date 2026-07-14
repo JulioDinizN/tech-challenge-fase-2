@@ -229,7 +229,9 @@
             </tr>
             <tr>
               <th>Vídeo de demonstração</th>
-              <td><span class="pending">PENDENTE:</span> adicionar o link do vídeo salvo no YouTube ou em outro local de preferência.</td>
+              <td>
+                <a href="https://drive.google.com/drive/folders/1ylK1dWw9cMf1YNMSYxpa0Lhwm1TjeKST?usp=sharing">Google Drive - Vídeo de demonstração do Grupo 76</a>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -294,12 +296,12 @@
           <tbody>
             <tr><th>Docker Compose com 9 contêineres</th><td><span class="status">Implementado e validado</span></td></tr>
             <tr><th>Dockerfiles dos 5 serviços</th><td><span class="status">Implementado</span></td></tr>
-            <tr><th>Terraform OCI reproduzível</th><td><span class="status">Validado: 53 creates, 0 changes, 0 destroys</span></td></tr>
-            <tr><th>Namespace, Deployments e Services</th><td><span class="status">Implementado e renderizado</span></td></tr>
-            <tr><th>ConfigMaps, Secrets, probes e limites</th><td><span class="status">Implementado e renderizado</span></td></tr>
-            <tr><th>Ingress NGINX e Load Balancer</th><td><span class="status waiting">Evidência cloud na gravação</span></td></tr>
-            <tr><th>HPA de evaluation e analytics</th><td><span class="status waiting">Evidência de escala na gravação</span></td></tr>
-            <tr><th>Queue para NoSQL</th><td><span class="status waiting">Evidência de persistência na gravação</span></td></tr>
+            <tr><th>Terraform OCI reproduzível</th><td><span class="status">Provisionado com state remoto privado</span></td></tr>
+            <tr><th>Namespace, Deployments e Services</th><td><span class="status">5 microsserviços prontos no OKE</span></td></tr>
+            <tr><th>ConfigMaps, Secrets, probes e limites</th><td><span class="status">Implantado e validado</span></td></tr>
+            <tr><th>Ingress NGINX e Load Balancer</th><td><span class="status">Smoke externo aprovado</span></td></tr>
+            <tr><th>HPA de evaluation e analytics</th><td><span class="status">Escala de 1 para 4 réplicas observada</span></td></tr>
+            <tr><th>Queue para NoSQL</th><td><span class="status">Eventos persistidos no OCI NoSQL</span></td></tr>
           </tbody>
         </table>
       </section>
@@ -322,6 +324,8 @@
           <li>Mapear SQS/DynamoDB para APIs nativas OCI sem alterar o contrato do evento.</li>
           <li>Evitar senha em Terraform e manifests usando geração no Vault e sincronização CSI.</li>
           <li>Inicializar bancos gerenciados com usuários restritos e Jobs idempotentes.</li>
+          <li>Diagnosticar o registro dos workers OKE até validar uma imagem Oracle Linux 8 compatível com o cluster.</li>
+          <li>Adequar imagens e manifests ao runtime CRI-O com UID numérico não root e referências de imagem totalmente qualificadas.</li>
           <li>Manter a topologia local exigida mesmo com integrações OCI desabilitadas no Compose.</li>
           <li>Planejar teardown na ordem correta, pois o Load Balancer criado pelo controller Kubernetes não pertence ao state Terraform.</li>
         </ul>
@@ -329,20 +333,9 @@
 
       <section>
         <h2>Validação e Evidências</h2>
-        <p>Antes do deploy foram executados testes unitários, build das cinco imagens locais, nove contêineres saudáveis, smoke completo com <code>result: true</code>, Terraform validate/plan com 53 criações e renderização dos 21 recursos da base e 32 do overlay OCI. Os scripts versionados automatizam smoke cloud, carga, geração do PDF e destruição ordenada.</p>
-        <p><strong>Importante:</strong> a versão final deste relatório só deve substituir o estado de preparação por evidência observada depois da implantação autorizada e da gravação.</p>
-      </section>
-
-      <section>
-        <h2>Pontuação Extra Opcional</h2>
-        <table>
-          <tbody>
-            <tr>
-              <th>Google Cloud Skills Boost</th>
-              <td>Não realizado no momento. Caso a trilha seja concluída, adicionar aqui o link público do perfil ou badge.</td>
-            </tr>
-          </tbody>
-        </table>
+        <p>Na validação local foram executados testes unitários, build das cinco imagens, nove contêineres saudáveis e smoke completo com <code>result: true</code>. A configuração Terraform e os manifests Kubernetes também passaram por validação e renderização antes do deploy.</p>
+        <p>Na OCI foram observados um worker OKE pronto, cinco Deployments disponíveis, três Jobs de banco concluídos, Secrets sincronizados pelo CSI, Ingress acessível pelo Load Balancer e smoke externo aprovado. Sob carga, os HPAs de evaluation e analytics escalaram de uma para quatro réplicas, enquanto eventos produzidos pela avaliação foram consumidos da OCI Queue e persistidos na tabela OCI NoSQL.</p>
+        <p>Os scripts versionados automatizam validação, build/push, deploy, smoke, carga, geração do PDF e destruição ordenada após a entrega.</p>
       </section>
 
       <p class="note">

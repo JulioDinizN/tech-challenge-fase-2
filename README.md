@@ -13,9 +13,9 @@ Repositório de entrega do ToggleMaster, Grupo 76. O projeto reúne os cinco mic
 | Kubernetes base e overlay OCI | Implantados e validados no OKE |
 | Scripts de build, deploy, smoke, carga e destroy | Implementados; fluxo cloud validado, destroy ainda não executado |
 | Evidências técnicas cloud | Pods, Ingress, HPA, Queue e NoSQL validados |
-| Vídeo e link final no PDF | Pendentes da gravação/finalização |
+| Vídeo e link final no PDF | Gravação concluída; link adicionado e PDF final gerado |
 
-O ambiente temporário de demonstração está provisionado. Os cinco Deployments estão prontos, o Ingress responde pelo OCI Load Balancer, os HPAs escalaram sob carga e um evento do smoke foi persistido no OCI NoSQL. Não execute um novo apply nem destrua o ambiente antes de terminar a gravação; depois dela, use o teardown ordenado e confira os custos no Console OCI.
+O ambiente temporário de demonstração está provisionado. Os cinco Deployments estão prontos, o Ingress responde pelo OCI Load Balancer, os HPAs escalaram sob carga e um evento do smoke foi persistido no OCI NoSQL. A gravação foi concluída; preserve o ambiente somente até confirmar o upload e o PDF final, então use o teardown ordenado e confira os custos no Console OCI.
 
 ## Estrutura
 
