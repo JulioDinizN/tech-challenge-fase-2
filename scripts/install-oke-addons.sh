@@ -57,13 +57,14 @@ helm upgrade --install nginx-ingress oci://ghcr.io/nginx/charts/nginx-ingress \
   --create-namespace \
   --version "$NGINX_INGRESS_CHART_VERSION" \
   --set controller.nginxplus=false \
+  --set controller.image.repository=docker.io/nginx/nginx-ingress \
   --set controller.enableCustomResources=false \
   --set controller.allowEmptyIngressHost=true \
   --set controller.replicaCount=1 \
   --set-string 'controller.service.annotations.oci\.oraclecloud\.com/load-balancer-type=lb' \
   --set-string "controller.service.annotations.service\\.beta\\.kubernetes\\.io/oci-load-balancer-subnet1=$lb_subnet" \
   --set-string "controller.service.annotations.oci\\.oraclecloud\\.com/oci-network-security-groups=$lb_nsg" \
-  --set-string 'controller.service.annotations.oci\.oraclecloud\.com/security-rule-management-mode=NSG' \
+  --set-string 'controller.service.annotations.oci\.oraclecloud\.com/security-rule-management-mode=None' \
   --set-string "controller.service.annotations.oci\\.oraclecloud\\.com/oci-backend-network-security-group=$worker_nsg" \
   --set-string 'controller.service.annotations.service\.beta\.kubernetes\.io/oci-load-balancer-shape=flexible' \
   --set-string 'controller.service.annotations.service\.beta\.kubernetes\.io/oci-load-balancer-shape-flex-min=10' \

@@ -1,6 +1,6 @@
 # OCI Terraform infrastructure
 
-This directory defines the cloud infrastructure required to run ToggleMaster on Oracle Cloud Infrastructure. Formatting, validation and a fresh read-only plan against the configured Ashburn tenancy pass. The current preview contains **53 creates, 0 changes and 0 destroys**, and **has not been applied**.
+This directory defines the cloud infrastructure used by ToggleMaster on Oracle Cloud Infrastructure. The authorized Ashburn stack has been applied with a private remote state backend and is temporarily active for the Group 76 demonstration. Do not run another full apply or destroy before the recording is complete.
 
 ## Challenge mapping
 
@@ -36,7 +36,7 @@ Essas tarefas estão em `k8s/` e `scripts/`. Separar a infraestrutura do deploy 
 - The OKE API endpoint is public but restricted to `api_allowed_cidrs`; worker and data resources have no public IPs.
 - Uma security list vazia explícita evita herdar regras da VCN; os NSGs versionados permitem os fluxos exigidos pelo OKE entre workers e o endpoint Kubernetes (`6443`, `12250` e retorno do control plane), além de `10256` entre o Load Balancer e o `kube-proxy`.
 - OKE uses the Flannel overlay CNI to keep the initial student deployment small and straightforward.
-- O node pool usa o padrão OCI de volumes paravirtualizados sem a opção adicional de criptografia PV em trânsito; os volumes permanecem criptografados em repouso e trafegam na rede interna da OCI. Durante o primeiro deploy do OKE 1.34.2, workers E5 com Oracle Linux 9.7 e 8.10 build 1505 não chegaram ao Oracle Cloud Agent nem ao kubelet e expiraram antes do registro. As rotas e NSGs exigidas estavam presentes, e a tenancy não possuía dynamic groups nem políticas OSMS/OSMH. Um teste A1/ARM em uma única AD foi rejeitado imediatamente por falta de capacidade física, sem iniciar um worker. O teste controlado seguinte usa um único worker E3/x86 em uma única AD para separar o caminho de boot/shape do caminho de rede do cluster.
+- O node pool usa o padrão OCI de volumes paravirtualizados sem a opção adicional de criptografia PV em trânsito; os volumes permanecem criptografados em repouso e trafegam na rede interna da OCI. Durante o primeiro deploy do OKE 1.34.2, workers E5 com imagens Oracle Linux 9.7 e 8.10 build 1505 não registraram; um worker E3/AD-3 com a mesma build 1505 repetiu o problema. A1/AD-1 e E3/AD-1/AD-2 foram rejeitados por falta de capacidade física. As rotas, DNS, NAT, Service Gateway, NSGs e o vínculo da VNIC foram verificados diretamente, e a tenancy não possuía dynamic groups nem políticas OSMS/OSMH. O teste E3/AD-3 com a imagem Oracle Linux 8.10 build 1462 registrou no OKE e apareceu como Ready no Kubernetes; essa é a configuração validada para a demonstração.
 - The default is an Enhanced OKE cluster because OCI workload identity and node cycling are enhanced-cluster features. A Basic cluster is possible only when `create_workload_identity_policy = false`; the applications would then need a different authentication design, such as instance principals.
 - O F5 NGINX Ingress Controller OSS cria dinamicamente um Load Balancer flexível de 10 Mbps na subnet pública e usa os NSGs expostos no output `network`. Esse Load Balancer não pertence ao state do Terraform; o teardown o remove e espera sua exclusão antes do `terraform destroy`.
 - O Terraform cria um Vault do tipo `DEFAULT` e uma chave `SOFTWARE`, opções dentro do Always Free, em vez de um Virtual Private Vault pago.
@@ -44,7 +44,9 @@ Essas tarefas estão em `k8s/` e `scripts/`. Separar a infraestrutura do deploy 
 - Cada PostgreSQL recebe seu próprio segredo administrativo e versão atual. No cluster, Jobs criam usuários de aplicação restritos; os Deployments não recebem a senha administrativa.
 - OCI Cache is private and TLS-only. The future application value should use the output `redis.tls_url` (`rediss://`).
 - The default one-node Redis cluster is a cost-conscious development setting, not a high-availability topology. OCI recommends at least three nodes for reliability; set `redis_node_count = 3` before a production-style deployment if the budget permits.
-- Queue producer and consumer access is separated with `queue-push` and `queue-pull`; analytics receives row-level NoSQL access. Uma policy separada na mesma resource autoriza somente a ServiceAccount do provider CSI, em `kube-system`, a usar segredos do Vault criado pelo stack.
+- Queue producer and consumer access is separated with `queue-push` and `queue-pull`; analytics receives row-level NoSQL access. Para o Vault, o provider CSI solicita o token da ServiceAccount do pod que monta cada `SecretProviderClass`; por isso a policy autoriza somente `auth-service`, `flag-service`, `targeting-service`, `evaluation-service` e `database-init`, no namespace e cluster esperados, a ler bundles do Vault deste stack.
+- O Load Balancer do Ingress usa `security-rule-management-mode=None`: as regras necessárias já pertencem aos NSGs gerenciados pelo Terraform, evitando conceder permissões amplas de alteração de rede ao controller. As imagens do NGINX e dos Jobs usam nomes totalmente qualificados (`docker.io/...`) porque o CRI-O do worker não aceita referências curtas sem registry.
+- O administrador do OCI Database with PostgreSQL possui `CREATEROLE`, mas não é superusuário. Os Jobs concedem associação temporária ao usuário de aplicação para atribuir ownership do banco, executam o schema com o próprio usuário e removem a associação administrativa ao final.
 - Os três PostgreSQL mantêm uma instância, mas usam famílias E5, E6 e Standard3 independentes por padrão. Auth e flags usam 1 OCPU/16 GB; targeting usa 2 OCPUs/32 GB porque esses são os mínimos aceitos pela família Standard3. Isso preserva o isolamento exigido e respeita o limite de um DB System por família disponível na tenancy estudantil; shapes, OCPUs e memória continuam configuráveis por serviço para outras regiões ou quotas.
 - PostgreSQL, Redis, and OKE sizes are variables because service availability, quotas, and cost differ by tenancy and region.
 
@@ -95,9 +97,13 @@ oci ce node-pool-options get \
 
 Set `node_image_id` to an OKE image that matches both the selected Kubernetes version and node shape. Terraform preconditions reject unsupported versions, shapes, and image IDs during planning.
 
+The worker configuration validated in Ashburn uses `Oracle-Linux-8.10-2026.04.30-3-OKE-1.34.2-1462` (`ocid1.image.oc1.iad.aaaaaaaauedaaoleflnipq4s6u37rb3wcu6xmod4eln6xrcc3h3hwtmswzyq`) with Kubernetes `v1.34.2` and the `VM.Standard.E3.Flex` shape. Image OCIDs are regional, so discover a matching image again if `region` changes.
+
 `node_pool_name` normally remains `null`, which produces `<project_name>-workers`. Set an explicit name only for a controlled blue/green node-pool replacement when an existing OCI work request prevents an in-place repair. Validate the replacement pool first, then delete the superseded pool so duplicate compute capacity does not remain billable.
 
 `node_availability_domain_count` normally remains `null`, allowing OKE to use every availability domain returned by the region. Set it to `1` only for a minimal diagnostic or short-lived demonstration pool when isolating availability-domain capacity or host boot behavior.
+
+`node_availability_domain_start_index` defaults to `0`. Change it only with an explicit `node_availability_domain_count` when testing capacity in a different availability domain; return it to `0` for the normal multi-AD pool.
 
 ## Preview the infrastructure without deploying
 
@@ -126,9 +132,9 @@ terraform init -migrate-state
 
 Edit `backend.tf` first. Do not place OCI keys or tokens in it; use the OCI profile or environment authentication. The native OCI backend provides state locking.
 
-## Future deployment workflow (not executed now)
+## Deployment and teardown workflow
 
-Depois dos pré-requisitos, revisão dos inputs e backend remoto, gere novamente o plano em vez de aplicar qualquer preview de desenvolvimento:
+Para uma recriação futura, revise inputs/custos e gere novamente o plano em vez de aplicar qualquer preview antigo:
 
 ```bash
 terraform plan -out=togglemaster.tfplan
@@ -138,7 +144,7 @@ terraform apply togglemaster.tfplan
 
 Applying can create billable resources. A human must review the saved plan and OCI pricing before the final command.
 
-Depois do apply autorizado:
+No ambiente atual, as etapas de apply, publicação, add-ons, deploy, smoke e carga já foram validadas. Em uma recriação autorizada:
 
 1. execute `terraform output -raw kubeconfig_command` e rode o comando exibido;
 2. defina `IMAGE_TAG`, `OCIR_USERNAME` e `OCIR_AUTH_TOKEN` somente no shell;

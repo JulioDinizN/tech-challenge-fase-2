@@ -49,6 +49,15 @@ spec:
                 configMapKeyRef:
                   name: togglemaster-config
                   key: OCI_AUTH_MODE
+            # The OCI Go SDK requires these resource-principal hints when it
+            # builds the OKE workload identity provider inside the pod.
+            - name: OCI_RESOURCE_PRINCIPAL_VERSION
+              value: "2.2"
+            - name: OCI_RESOURCE_PRINCIPAL_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: togglemaster-config
+                  key: OCI_REGION
             - name: OCI_QUEUE_OCID
               valueFrom:
                 configMapKeyRef:

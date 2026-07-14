@@ -144,3 +144,45 @@ Verification:
 - as cinco imagens locais foram reconstruídas e os nove contêineres ficaram saudáveis;
 - o smoke auth/flag/targeting/evaluation passou com status `200` e `result: true`;
 - nenhum apply, push de imagem ou alteração cloud foi executado.
+
+## 2026-07-14 - Compatibilidade dos contêineres e Workload Identity no OKE
+
+Requirement: Executar os cinco microsserviços no OKE com usuário não root, segredos externos e acesso à OCI sem chaves estáticas.
+
+Problem: As imagens funcionavam no Docker Compose, mas o OKE recusava iniciar os contêineres com `runAsNonRoot` porque os Dockerfiles declaravam um usuário por nome. Depois disso, o `evaluation-service` ainda não conseguia inicializar o provider de Workload Identity do OCI Go SDK sem os parâmetros de resource principal exigidos pelo SDK.
+
+Root causes:
+
+- o runtime CRI-O não consegue comprovar antecipadamente que um nome de usuário da imagem corresponde a um UID diferente de zero;
+- `runAsNonRoot` exige um UID numérico verificável;
+- o provider OKE do OCI Go SDK usa o token da ServiceAccount, mas também espera `OCI_RESOURCE_PRINCIPAL_VERSION` e a região no ambiente do contêiner;
+- o ambiente local não fornece Workload Identity e deve continuar usando os fallbacks existentes.
+
+Decision:
+
+- executar todos os microsserviços com o UID numérico dedicado `10001`;
+- manter os security contexts, filesystem somente leitura e capabilities removidas;
+- fornecer ao `evaluation-service` a versão `2.2` e a região já existente no ConfigMap, sem adicionar credenciais ao pod;
+- preservar os modos `instance_principal`, `config_file` e os fallbacks locais.
+
+Fix:
+
+- os cinco Dockerfiles agora criam o usuário de aplicação com UID/GID `10001` e terminam com `USER 10001`;
+- o Deployment do `evaluation-service` define `OCI_RESOURCE_PRINCIPAL_VERSION=2.2` e mapeia `OCI_RESOURCE_PRINCIPAL_REGION` a partir de `OCI_REGION`;
+- as imagens corrigidas foram publicadas no OCIR com uma tag imutável de demonstração.
+
+Local compatibility:
+
+- Docker Compose continua usando as mesmas imagens, portas e variáveis;
+- o UID numérico não altera o usuário efetivo nem exige privilégios adicionais;
+- as variáveis de Workload Identity existem somente no manifest Kubernetes;
+- sem `OCI_QUEUE_OCID`, o `evaluation-service` continua registrando o evento localmente em vez de acessar OCI.
+
+Verification:
+
+- o OKE aceitou as cinco imagens com `runAsNonRoot` e deixou os cinco Deployments `Ready`;
+- os logs do `evaluation-service` confirmaram conexão ao OCI Cache e inicialização do publicador OCI Queue;
+- o smoke externo pelo Ingress retornou `200` na validação e avaliação e `201` na primeira criação de flag e regra;
+- o evento da avaliação apareceu na tabela OCI NoSQL após o consumo da Queue;
+- sob carga, os HPAs de evaluation e analytics criaram quatro réplicas prontas de cada serviço;
+- após a carga e a redução das réplicas, um novo smoke externo terminou com sucesso.

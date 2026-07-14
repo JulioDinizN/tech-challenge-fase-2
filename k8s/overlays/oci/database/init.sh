@@ -28,6 +28,10 @@ PGPASSWORD="$ADMIN_PASSWORD" psql \
 SELECT format('CREATE ROLE %I LOGIN PASSWORD %L', :'app_user', :'app_password')
 WHERE NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = :'app_user') \gexec
 SELECT format('ALTER ROLE %I WITH LOGIN PASSWORD %L', :'app_user', :'app_password') \gexec
+-- OCI Database with PostgreSQL grants CREATEROLE to the administrator without
+-- making it a superuser. PostgreSQL therefore requires role membership before
+-- that administrator can assign database ownership to the application role.
+SELECT format('GRANT %I TO %I', :'app_user', current_user) \gexec
 SELECT format('CREATE DATABASE %I OWNER %I', :'db_name', :'app_user')
 WHERE NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = :'db_name') \gexec
 SELECT format('ALTER DATABASE %I OWNER TO %I', :'db_name', :'app_user') \gexec
@@ -40,5 +44,18 @@ PGPASSWORD="$APP_PASSWORD" psql \
   --dbname="$DB_NAME" \
   --set=ON_ERROR_STOP=1 \
   --file="/database-init/$SCHEMA_FILE"
+
+# Membership is needed only while assigning ownership. Remove it after the
+# application role has initialized its own schema; a later idempotent run will
+# grant it again before ownership operations.
+PGPASSWORD="$ADMIN_PASSWORD" psql \
+  --host="$DB_HOST" \
+  --port="$DB_PORT" \
+  --username="$DB_ADMIN_USER" \
+  --dbname=postgres \
+  --set=ON_ERROR_STOP=1 \
+  --set=app_user="$DB_APP_USER" <<'SQL'
+SELECT format('REVOKE %I FROM %I', :'app_user', current_user) \gexec
+SQL
 
 echo "Banco $DB_NAME e schema $SCHEMA_FILE inicializados com sucesso."

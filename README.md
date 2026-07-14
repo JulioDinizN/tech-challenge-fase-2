@@ -8,13 +8,14 @@ Repositório de entrega do ToggleMaster, Grupo 76. O projeto reúne os cinco mic
 | --- | --- |
 | Dockerfiles e Docker Compose local | Implementado e validado |
 | Adaptação Queue/NoSQL para OCI | Implementada com fallback local |
-| Terraform de rede, OKE, OCIR e dados | Implementado; plan aprovado com 53 creates, 0 changes, 0 destroys |
-| OCI Vault e segredos gerados | Implementados no Terraform; não provisionados |
-| Kubernetes base e overlay OCI | Implementados e renderizados localmente |
-| Scripts de build, deploy, teste e destroy | Implementados; execução cloud pendente |
-| Evidências, vídeo e link final no PDF | Pendentes da janela de demonstração |
+| Terraform de rede, OKE, OCIR e dados | Aplicado em OCI com state remoto privado |
+| OCI Vault e segredos gerados | Provisionados e consumidos via CSI/Workload Identity |
+| Kubernetes base e overlay OCI | Implantados e validados no OKE |
+| Scripts de build, deploy, smoke, carga e destroy | Implementados; fluxo cloud validado, destroy ainda não executado |
+| Evidências técnicas cloud | Pods, Ingress, HPA, Queue e NoSQL validados |
+| Vídeo e link final no PDF | Pendentes da gravação/finalização |
 
-Nenhum recurso cloud foi criado por este repositório até o momento. `terraform apply`, publicação no OCIR e `kubectl apply` só devem ser executados durante a janela autorizada de demonstração, após revisão do plano e dos custos.
+O ambiente temporário de demonstração está provisionado. Os cinco Deployments estão prontos, o Ingress responde pelo OCI Load Balancer, os HPAs escalaram sob carga e um evento do smoke foi persistido no OCI NoSQL. Não execute um novo apply nem destrua o ambiente antes de terminar a gravação; depois dela, use o teardown ordenado e confira os custos no Console OCI.
 
 ## Estrutura
 
@@ -60,7 +61,7 @@ O Terraform em `infra/oci/` cobre VCN, OKE, cinco repositórios OCIR, três sist
 
 O overlay `k8s/overlays/oci/` transforma outputs não secretos do Terraform em ConfigMaps, referências de imagem e `SecretProviderClass`. O Secrets Store CSI sincroniza os valores do Vault em Secrets nativos do Kubernetes; nenhum valor secreto é renderizado ou versionado.
 
-Consulte `infra/oci/README.md`, `k8s/README.md` e `scripts/README.md` antes da implantação.
+Consulte `infra/oci/README.md`, `k8s/README.md` e `scripts/README.md` para operação, evidências e teardown.
 
 ## Origem dos microsserviços
 

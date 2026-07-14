@@ -30,7 +30,8 @@ fi
 
 api_key="$(kubectl --namespace togglemaster get secret evaluation-runtime-secrets \
   -o jsonpath='{.data.SERVICE_API_KEY}' | base64 --decode)"
-headers=(-H "Authorization: Bearer $api_key" -H 'Content-Type: application/json')
+ingress_host="${INGRESS_HOST:-togglemaster.local}"
+headers=(-H "Host: $ingress_host" -H "Authorization: Bearer $api_key" -H 'Content-Type: application/json')
 flag_name="${FLAG_NAME:-enable-oke-demo}"
 body="$(mktemp)"
 trap 'rm -f "$body"' EXIT

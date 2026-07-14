@@ -153,6 +153,17 @@ variable "node_availability_domain_count" {
   }
 }
 
+variable "node_availability_domain_start_index" {
+  description = "Zero-based availability-domain index at which worker placement starts."
+  type        = number
+  default     = 0
+
+  validation {
+    condition     = var.node_availability_domain_start_index >= 0
+    error_message = "node_availability_domain_start_index must be zero or greater."
+  }
+}
+
 variable "node_ocpus" {
   description = "OCPUs allocated to each flexible OKE worker node."
   type        = number

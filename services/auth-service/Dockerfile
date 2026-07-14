@@ -10,11 +10,11 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /out/auth-service .
 FROM alpine:3.20
 
 RUN apk add --no-cache ca-certificates
-RUN adduser -D -H appuser
+RUN adduser -D -H -u 10001 appuser
 
 WORKDIR /app
 COPY --from=builder /out/auth-service /app/auth-service
 
-USER appuser
+USER 10001
 EXPOSE 8001
 ENTRYPOINT ["/app/auth-service"]

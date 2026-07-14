@@ -43,4 +43,4 @@ if [[ "${FINAL_DELIVERY:-0}" == "1" ]] && rg -n 'PENDENTE|replace-me|replace-wit
   exit 1
 fi
 
-echo "Safe pre-deployment validation passed. No infrastructure was applied."
+echo "Safe source validation passed. This script performed no cloud mutations."

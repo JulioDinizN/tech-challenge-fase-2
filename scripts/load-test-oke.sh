@@ -17,15 +17,20 @@ fi
 duration="${DURATION:-2m}"
 concurrency="${CONCURRENCY:-40}"
 flag_name="${FLAG_NAME:-enable-oke-demo}"
+ingress_host="${INGRESS_HOST:-togglemaster.local}"
 
 echo "In another terminal, record: kubectl -n togglemaster get hpa,pods -w"
 echo "Generating evaluation and OCI Queue load for $duration with concurrency $concurrency"
 url="$base_url/evaluate?user_id=load-test-user&flag_name=$flag_name"
 if command -v hey >/dev/null; then
-  hey -z "$duration" -c "$concurrency" "$url"
+  hey -z "$duration" -c "$concurrency" -H "Host: $ingress_host" "$url"
 else
   script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  python3 "$script_dir/load-test.py" --duration "$duration" --concurrency "$concurrency" "$url"
+  python3 "$script_dir/load-test.py" \
+    --duration "$duration" \
+    --concurrency "$concurrency" \
+    --host "$ingress_host" \
+    "$url"
 fi
 
 kubectl --namespace togglemaster get hpa,pods

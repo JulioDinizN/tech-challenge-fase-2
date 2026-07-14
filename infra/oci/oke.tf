@@ -60,10 +60,10 @@ resource "oci_containerengine_node_pool" "main" {
     dynamic "placement_configs" {
       for_each = slice(
         data.oci_identity_availability_domains.available.availability_domains,
-        0,
-        coalesce(
+        var.node_availability_domain_start_index,
+        var.node_availability_domain_start_index + coalesce(
           var.node_availability_domain_count,
-          length(data.oci_identity_availability_domains.available.availability_domains),
+          length(data.oci_identity_availability_domains.available.availability_domains) - var.node_availability_domain_start_index,
         ),
       )
 
@@ -114,10 +114,13 @@ resource "oci_containerengine_node_pool" "main" {
 
     precondition {
       condition = (
-        var.node_availability_domain_count == null ||
-        var.node_availability_domain_count <= length(data.oci_identity_availability_domains.available.availability_domains)
+        var.node_availability_domain_start_index < length(data.oci_identity_availability_domains.available.availability_domains) &&
+        (
+          var.node_availability_domain_count == null ||
+          var.node_availability_domain_start_index + var.node_availability_domain_count <= length(data.oci_identity_availability_domains.available.availability_domains)
+        )
       )
-      error_message = "node_availability_domain_count exceeds the availability domains in the selected region."
+      error_message = "The configured worker availability-domain range exceeds the availability domains in the selected region."
     }
   }
 }

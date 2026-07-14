@@ -37,8 +37,12 @@ IMAGE_TAG=<git-sha> ./scripts/render-oci-manifests.py
 
 Os valores do Vault não entram no YAML. Eles são buscados em runtime pelo provider CSI e sincronizados nos Secrets esperados pelos Deployments.
 
+O Ingress usa o host `togglemaster.local` para ser aceito pelo F5 NGINX. Durante a demonstração sem DNS, envie `Host: togglemaster.local` ao IP do Load Balancer; os scripts de smoke e carga já fazem isso automaticamente.
+
 ## Add-ons
 
 `scripts/install-oke-addons.sh` instala versões fixadas do Secrets Store CSI Driver, provider OCI Vault, Metrics Server e F5 NGINX Ingress Controller OSS. O script também passa ao Service `LoadBalancer` a subnet e os NSGs criados pelo Terraform.
 
-Não execute os scripts de instalação/deploy sem infraestrutura aplicada, kubeconfig correto e autorização explícita.
+O deploy validado usa imagens com UID numérico para satisfazer `runAsNonRoot`, referências `docker.io/...` explícitas para imagens públicas e Workload Identity por ServiceAccount. Os três Jobs de banco são idempotentes e removem a associação administrativa temporária depois de criar ownership e schema.
+
+O ambiente de demonstração foi implantado e validado em 2026-07-14: cinco Deployments prontos, três Jobs completos, Ingress público funcional, métricas disponíveis, dois HPAs escalando e evento Queue→NoSQL persistido. Não execute instalação, novo deploy ou teardown sem confirmar o kubeconfig e a etapa atual da gravação.

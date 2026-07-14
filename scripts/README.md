@@ -1,6 +1,6 @@
 # Scripts
 
-Automação reproduzível da validação e da janela de demonstração. Scripts que alteram OCI/Kubernetes existem para execução futura; nenhum foi executado durante o desenvolvimento.
+Automação reproduzível da validação e da janela de demonstração. O fluxo de build/push, add-ons, deploy, smoke e carga foi executado com sucesso no ambiente temporário; o destroy permanece pendente até o fim da gravação.
 
 | Script | Finalidade | Altera cloud |
 | --- | --- | --- |
