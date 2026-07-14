@@ -131,6 +131,17 @@ variable "node_pool_size" {
   }
 }
 
+variable "node_pool_name" {
+  description = "Optional explicit OKE node-pool name, useful for controlled pool replacement."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.node_pool_name == null || length(trimspace(var.node_pool_name)) > 0
+    error_message = "node_pool_name must be null or a non-empty string."
+  }
+}
+
 variable "node_ocpus" {
   description = "OCPUs allocated to each flexible OKE worker node."
   type        = number

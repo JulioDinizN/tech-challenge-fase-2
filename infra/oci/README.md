@@ -36,7 +36,7 @@ Essas tarefas estão em `k8s/` e `scripts/`. Separar a infraestrutura do deploy 
 - The OKE API endpoint is public but restricted to `api_allowed_cidrs`; worker and data resources have no public IPs.
 - Uma security list vazia explícita evita herdar regras da VCN; os NSGs versionados permitem os fluxos exigidos pelo OKE entre workers e o endpoint Kubernetes (`6443`, `12250` e retorno do control plane), além de `10256` entre o Load Balancer e o `kube-proxy`.
 - OKE uses the Flannel overlay CNI to keep the initial student deployment small and straightforward.
-- O node pool usa o padrão OCI de volumes paravirtualizados sem a opção adicional de criptografia PV em trânsito. Os volumes permanecem criptografados em repouso e trafegam na rede interna da OCI; habilitar essa opção fez os workers Oracle Linux 9.7 pararem no initramfs durante a descoberta iSCSI e expirarem antes do registro no OKE.
+- O node pool usa o padrão OCI de volumes paravirtualizados sem a opção adicional de criptografia PV em trânsito; os volumes permanecem criptografados em repouso e trafegam na rede interna da OCI. Para OKE 1.34.2, use uma imagem Oracle Linux 8.10 compatível e atual: a imagem Oracle Linux 9.7 build 1505 disponível durante o primeiro deploy parou no initramfs durante a descoberta iSCSI e expirou antes do registro no OKE, independentemente dessa opção de criptografia.
 - The default is an Enhanced OKE cluster because OCI workload identity and node cycling are enhanced-cluster features. A Basic cluster is possible only when `create_workload_identity_policy = false`; the applications would then need a different authentication design, such as instance principals.
 - O F5 NGINX Ingress Controller OSS cria dinamicamente um Load Balancer flexível de 10 Mbps na subnet pública e usa os NSGs expostos no output `network`. Esse Load Balancer não pertence ao state do Terraform; o teardown o remove e espera sua exclusão antes do `terraform destroy`.
 - O Terraform cria um Vault do tipo `DEFAULT` e uma chave `SOFTWARE`, opções dentro do Always Free, em vez de um Virtual Private Vault pago.
@@ -94,6 +94,8 @@ oci ce node-pool-options get \
 ```
 
 Set `node_image_id` to an OKE image that matches both the selected Kubernetes version and node shape. Terraform preconditions reject unsupported versions, shapes, and image IDs during planning.
+
+`node_pool_name` normally remains `null`, which produces `<project_name>-workers`. Set an explicit name only for a controlled blue/green node-pool replacement when an existing OCI work request prevents an in-place repair. Validate the replacement pool first, then delete the superseded pool so duplicate compute capacity does not remain billable.
 
 ## Preview the infrastructure without deploying
 

@@ -42,7 +42,7 @@ resource "oci_containerengine_node_pool" "main" {
   cluster_id         = oci_containerengine_cluster.main.id
   compartment_id     = var.compartment_id
   kubernetes_version = var.kubernetes_version
-  name               = "${var.project_name}-workers"
+  name               = coalesce(var.node_pool_name, "${var.project_name}-workers")
   node_shape         = var.node_shape
   ssh_public_key     = var.ssh_public_key
   freeform_tags      = local.common_tags
@@ -90,6 +90,8 @@ resource "oci_containerengine_node_pool" "main" {
   }
 
   lifecycle {
+    create_before_destroy = true
+
     precondition {
       condition     = contains(data.oci_containerengine_node_pool_option.oke.shapes, var.node_shape)
       error_message = "node_shape is not supported for this OKE node-pool configuration."
